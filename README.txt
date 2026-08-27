@@ -11,6 +11,14 @@ Sitio one-page desde su origen: no hay eliminaciones de /servicios/ ni
 /modelos/ en el historial, así que NO se ha añadido middleware.mjs, no
 aplica.
 
+REVISIÓN ADICIONAL — BUG REAL (a petición del cliente):
+- No existía menú móvil: la regla @media(max-width:900px){.menu{
+  display:none}} ocultaba la navegación sin ningún botón/desplegable
+  alternativo, así que en móvil no había forma de navegar (el hueco
+  vacío arriba a la derecha del logo era justo donde debía estar el
+  botón). Añadido .menu-btn ("☰") + panel #mobileMenu con los mismos
+  7 enlaces, siguiendo el patrón estándar de la familia.
+
 TELÉFONOS — CONFIRMADO POR EL CLIENTE:
 - El botón de llamada del hero (.phone-cta) usa tel:+34914468503, el
   número compartido de la familia Kelatos, a propósito.
