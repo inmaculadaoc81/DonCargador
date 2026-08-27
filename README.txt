@@ -11,19 +11,13 @@ Sitio one-page desde su origen: no hay eliminaciones de /servicios/ ni
 /modelos/ en el historial, así que NO se ha añadido middleware.mjs, no
 aplica.
 
-⚠️ AVISO — POSIBLE INCONSISTENCIA DE TELÉFONO (no resuelta, no tocada):
-- El botón de llamada del hero (.phone-cta) enlaza a tel:+34914468503
-  (el número genérico de Madrid usado en gran parte de la familia
-  Kelatos), pero SIN mostrar el número en el texto del botón (solo
-  dice "Atención Telefónica 24 horas 365 días").
-- La caja de información y el footer muestran un número distinto,
-  +34 918 29 46 58, como texto informativo (sin enlace tel:).
-- No hay README previo que confirme si esto es intencional (como en
-  PuntoRecicla o ConvertVideo) o un descuido de plantilla. Siguiendo la
-  norma de esta sesión de no modificar teléfonos sin confirmación, NO
-  se ha tocado ninguno de los dos. Se usó +34 918 29 46 58 (el que se
-  repite en info y footer) como teléfono del schema.org, por ser el que
-  parece identificar al negocio, pero conviene que lo confirmes.
+TELÉFONOS — CONFIRMADO POR EL CLIENTE:
+- El botón de llamada del hero (.phone-cta) usa tel:+34914468503, el
+  número compartido de la familia Kelatos, a propósito.
+- La caja de información y el footer muestran +34 918 29 46 58, el
+  número propio del negocio, a propósito. Es el mismo usado en
+  schema.org. Confirmado que es intencional (mismo patrón que otros
+  repos de la familia); no se ha tocado nada.
 
 REVISIÓN (todo lo aplicado en esta primera pasada):
 - Google Analytics: ya estaba configurado con G-1N6P0PDE1K (coincide
