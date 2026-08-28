@@ -18,6 +18,13 @@ REVISIÓN ADICIONAL — BUG REAL (a petición del cliente):
   vacío arriba a la derecha del logo era justo donde debía estar el
   botón). Añadido .menu-btn ("☰") + panel #mobileMenu con los mismos
   7 enlaces, siguiendo el patrón estándar de la familia.
+- BUG REAL adicional (a petición del cliente, tras ver capturas): el
+  panel se abría pero se veía mal — salía como una columna estrecha
+  junto al logo, no como un desplegable a todo el ancho debajo de la
+  cabecera. Causa: .top (la cabecera) es display:flex, así que
+  #mobileMenu (hermano directo del logo/nav) se comportaba como un
+  elemento más de esa fila flex en vez de apilarse debajo. Corregido
+  con position:absolute;top:100%;left:0;right:0 en .mobile-menu.
 
 TELÉFONOS — CONFIRMADO POR EL CLIENTE:
 - El botón de llamada del hero (.phone-cta) usa tel:+34914468503, el
