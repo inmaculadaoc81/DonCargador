@@ -63,6 +63,35 @@ REVISIÓN (todo lo aplicado en esta primera pasada):
 - api/contact.js ya usaba SMTP + nodemailer correctamente; no requería
   conversión.
 
+REVISIÓN ADICIONAL (checklist unificado de la familia, a petición del cliente):
+- H1 repetía la plantilla "Tu X no Y. Aquí Z." usada en varios repos
+  ("Tu portátil no carga. Aquí identificamos el cargador correcto.").
+  Reescrito en formato imperativo: "Encuentra el cargador original
+  correcto para tu portátil." (8 palabras).
+- BUG REAL — el botón CTA de teléfono no tenía icono, a diferencia del
+  de WhatsApp. Añadido (verificado con cuidado el cierre de las
+  etiquetas </a>: 24 aperturas / 24 cierres).
+- BUG REAL — el formulario no tenía ninguna casilla de consentimiento
+  de política de privacidad. Añadida desde cero, con el texto y
+  enlace estándar de la familia, resaltado en azul.
+- BUG REAL — no existía franja de aviso de servicio técnico
+  independiente debajo del menú. IMPORTANTE: como .top (la cabecera)
+  es display:flex —el mismo motivo por el que el menú móvil tuvo que
+  usar position:absolute en la revisión anterior—, la franja NO se ha
+  insertado como hijo/hermano dentro de <header>, sino como elemento
+  independiente justo después de </header> y antes de <main>, para
+  que se apile correctamente debajo de la cabecera en vez de
+  comportarse como un elemento más de esa fila flex.
+- Añadido "Sábados, domingos y días festivos estamos cerrados" debajo
+  del horario.
+- Verificado sin bugs: .hero-lines es una forma decorativa sin texto
+  (no es el patrón de etiqueta rotada tipo hero-chip); el texto
+  decorativo ".hero:before" ("CARGADOR ORIGINAL", 72px) ya se reducía
+  correctamente a 44px en el único breakpoint del sitio (900px);
+  schema.org ya usaba correctamente el teléfono de la caja de
+  información (+34 918 29 46 58); formulario correctamente conectado
+  a /api/contact.
+
 Variables SMTP en Vercel (ya configuradas, sin cambios):
 SMTP_HOST=cp7124.webempresa.eu
 SMTP_PORT=465
