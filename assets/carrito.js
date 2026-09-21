@@ -14,6 +14,7 @@
   let catalogo=new Map();let carrito=[];let disponible=false;
   function dinero(n){return Number(n).toLocaleString('es-ES',{style:'currency',currency:'EUR'});}
   function escapar(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function unidades(p){const n=Number(p?.stock_disponible);return p?.stock_disponible!=null&&Number.isSafeInteger(n)&&n>=0?n:null;}
   function cargar(){try{const x=JSON.parse(localStorage.getItem(CLAVE)||'[]');return Array.isArray(x)?x.filter(y=>y&&typeof y.referencia==='string'&&Number.isInteger(y.cantidad)&&y.cantidad>0&&y.cantidad<=20).slice(0,20):[];}catch{return [];}}
   function guardar(){try{localStorage.setItem(CLAVE,JSON.stringify(carrito));}catch{estado.textContent='No se puede guardar el carrito en este navegador.';}}
   function entregaElegida(){return formulario.elements.entrega.value==='envio'?'envio':'recogida';}
@@ -25,13 +26,19 @@
   }
   function pintar(){
     const validas=carrito.filter(x=>catalogo.has(x.referencia));
-    disponible=carrito.length>0&&validas.length===carrito.length;
+    const problemas=carrito.filter(x=>{const p=catalogo.get(x.referencia);const stock=unidades(p);return !p||stock===null||stock<x.cantidad;});
+    disponible=carrito.length>0&&validas.length===carrito.length&&problemas.length===0;
     if(!carrito.length){lista.textContent='Tu carrito está vacío. Vuelve al catálogo para elegir un cargador.';subtotal.textContent='';resumenEntrega.textContent='';totalEstimado.textContent='';}
     else{
       lista.innerHTML=carrito.map(l=>{
         const p=catalogo.get(l.referencia);
-        return '<div class="linea"><div><strong>'+escapar(p?.nombre||'Producto no disponible')+'</strong><small>Referencia: '+escapar(l.referencia)+'</small></div>'+
-          '<label>Cantidad <input type="number" min="1" max="20" step="1" value="'+l.cantidad+'" data-cantidad="'+escapar(l.referencia)+'" aria-label="Cantidad de '+escapar(p?.nombre||'producto')+'"></label>'+
+        const stock=unidades(p);
+        const avisoStock=!p?'Producto agotado o retirado del catálogo':stock===null?'Existencias pendientes de confirmar':stock<l.cantidad?'Aviso: solo quedan '+stock+' unidades disponibles':'';
+        const textoStock=stock===null?'Stock no confirmado':'Stock disponible: '+stock+' '+(stock===1?'unidad':'unidades');
+        const maximo=stock===null?20:Math.min(20,Math.max(1,stock));
+        return '<div class="linea"><div><strong>'+escapar(p?.nombre||'Producto no disponible')+'</strong><small>Referencia: '+escapar(l.referencia)+'</small><small style="display:block">'+textoStock+'</small>'+
+          (avisoStock?'<small role="alert" style="display:block;color:#9c2626;font-weight:700">'+avisoStock+'</small>':'')+'</div>'+
+          '<label>Cantidad <input type="number" min="1" max="'+maximo+'" step="1" value="'+l.cantidad+'" data-cantidad="'+escapar(l.referencia)+'" aria-label="Cantidad de '+escapar(p?.nombre||'producto')+'"></label>'+
           '<button type="button" data-quitar="'+escapar(l.referencia)+'">Quitar</button><span class="precio">'+(p?dinero(Number(p.precio)*l.cantidad):'Sin existencias')+'</span></div>';
       }).join('');
       const productos=validas.reduce((n,l)=>n+Math.round(Number(catalogo.get(l.referencia).precio)*100)*l.cantidad,0);
@@ -42,7 +49,7 @@
     }
     boton.disabled=!cfg.pagosHabilitados||!disponible;
     boton.textContent=cfg.pagosHabilitados?'Continuar al pago':'Pago online en preparación';
-    if (!disponible&&carrito.length) estado.textContent='Hay productos agotados o no disponibles. Elimínalos del carrito.';
+    if(problemas.length) estado.textContent='Aviso: la cantidad solicitada supera las existencias o hay productos no disponibles. Ajusta las cantidades o elimina esos productos.';
     else if(!cfg.pagosHabilitados) estado.textContent='La tienda aún no acepta pagos online. Puedes preparar tu carrito.';
     else estado.textContent='';
   }
@@ -50,7 +57,9 @@
     const input=e.target.closest('input[data-cantidad]');if(!input)return;
     const l=carrito.find(x=>x.referencia===input.dataset.cantidad);if(!l)return;
     const n=Number(input.value);
+    const stock=unidades(catalogo.get(l.referencia));
     if(!Number.isSafeInteger(n)||n<1||n>20){input.value=String(l.cantidad);return;}
+    if(stock!==null&&n>stock){estado.textContent='Aviso: solo hay '+stock+' unidades disponibles. Ajusta la cantidad.';input.value=String(l.cantidad);return;}
     l.cantidad=n;guardar();pintar();
   });
   lista.addEventListener('click',e=>{
@@ -67,7 +76,7 @@
       catalogo=new Map(d.piezas.filter(p=>p.categoria==='CARGADOR'&&typeof p.referencia==='string'&&Number(p.precio)>0&&
         !/dyson/i.test(String(p.nombre||'')+' '+String(p.descripcion||''))).map(p=>[p.referencia,p]));
       pintar();
-    }catch{lista.textContent='No se pudo comprobar el inventario. Inténtalo más tarde.';boton.disabled=true;}
+    }catch{lista.textContent='No se pudo comprobar el inventario. Inténtalo más tarde.';boton.disabled=true;estado.textContent='No se puede confirmar el stock. No se iniciará ningún pago.';}
   }
   formulario.addEventListener('submit',async e=>{
     e.preventDefault();if(!cfg.pagosHabilitados||!disponible||boton.disabled)return;
