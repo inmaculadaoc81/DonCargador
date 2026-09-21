@@ -1,7 +1,7 @@
 (function () {
   "use strict";
-  // El carrito es exclusivamente visual. Sin ID único ni stock confirmado NO se permite
-  // incrementar cantidades ni tramitar pedidos. No se escribe en el inventario.
+  // Demostración: no hay pedidos, reservas ni pagos. El stock del navegador no autoriza compras.
+  var CLAVE = "doncargador_carrito_demo";
   var carrito = [];
   var lista = document.getElementById("carrito-demo-lista");
   var total = document.getElementById("carrito-demo-total");
@@ -10,26 +10,23 @@
   var formato = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" });
   if (!lista || !total || !contador) return;
 
-  function escapar(s) {
-    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  }
-
+  function guardar() { try { sessionStorage.setItem(CLAVE, JSON.stringify(carrito)); } catch(e) {} }
   function pintar() {
     lista.replaceChildren();
-    var importe = 0;
+    var importe = 0, unidades = 0;
     carrito.forEach(function (p) {
-      importe += p.precio;
+      importe += p.precio * p.cantidad;
+      unidades += p.cantidad;
       var fila = document.createElement("li");
       fila.className = "carrito-demo-item";
       var nombre = document.createElement("span");
-      nombre.textContent = p.nombre + " · " + formato.format(p.precio) + " (IVA incl.)";
+      nombre.textContent = p.nombre + " · " + p.cantidad + " × " + formato.format(p.precio) + " (IVA incl.)";
       var eliminar = document.createElement("button");
       eliminar.type = "button";
       eliminar.className = "carrito-demo-eliminar";
       eliminar.textContent = "Eliminar";
-      eliminar.setAttribute("aria-label", "Eliminar " + p.nombre + " del carrito");
       eliminar.addEventListener("click", function () {
-        carrito = carrito.filter(function (item) { return item.clave !== p.clave; });
+        carrito = carrito.filter(function (item) { return item.referencia !== p.referencia; });
         pintar();
       });
       fila.append(nombre, eliminar);
@@ -40,37 +37,48 @@
       vacio.textContent = "Tu carrito de demostración está vacío.";
       lista.append(vacio);
     }
-    contador.textContent = String(carrito.length);
+    contador.textContent = String(unidades);
     total.textContent = formato.format(importe);
-    if (aviso) aviso.textContent = "Vista de prueba: no se puede confirmar el stock ni comprar. Cada producto se muestra una sola vez hasta que Kelatos facilite su referencia y existencias verificables.";
-    try { sessionStorage.setItem("doncargador_carrito_demo", JSON.stringify(carrito)); } catch (e) {}
+    if (aviso) aviso.textContent = "Vista de prueba: los pagos y las reservas no están habilitados. Comprueba las existencias en la página del carrito.";
+    guardar();
   }
 
   try {
-    var anterior = JSON.parse(sessionStorage.getItem("doncargador_carrito_demo") || "[]");
-    // Los datos del navegador no son un pedido ni una fuente fiable de precios o stock.
+    var anterior = JSON.parse(sessionStorage.getItem(CLAVE) || "[]");
     if (Array.isArray(anterior)) carrito = anterior.filter(function (p) {
-      return p && typeof p.clave === "string" && typeof p.nombre === "string" &&
-        typeof p.precio === "number" && Number.isFinite(p.precio) && p.precio >= 0;
-    }).slice(0, 50).map(function (p) { return { clave: p.clave, nombre: p.nombre, precio: p.precio }; });
-    carrito = carrito.filter(function (p, i) { return carrito.findIndex(function (x) { return x.clave === p.clave; }) === i; });
-  } catch (e) {}
+      return p && typeof p.referencia === "string" && p.referencia.trim() &&
+        Number.isSafeInteger(p.cantidad) && p.cantidad > 0 && p.cantidad <= 999 &&
+        typeof p.nombre === "string" && Number.isFinite(p.precio) && p.precio >= 0;
+    }).slice(0,50).map(function (p) {
+      return {referencia:p.referencia,nombre:p.nombre,precio:p.precio,cantidad:p.cantidad};
+    });
+    carrito = carrito.filter(function (p,i) { return carrito.findIndex(function (x) {return x.referencia === p.referencia;}) === i; });
+  } catch(e) {}
 
   document.addEventListener("click", function (evento) {
     var agregar = evento.target.closest("[data-agregar-carrito-demo]");
-    if (!agregar) return;
+    if (!agregar || agregar.disabled) return;
     var tarjeta = agregar.closest(".cargador-card");
     var nombre = tarjeta && tarjeta.querySelector(".cargador-nombre");
+    var avisoTarjeta = tarjeta && tarjeta.querySelector(".cargador-stock-aviso");
     var precio = Number(agregar.dataset.precio);
-    var clave = agregar.dataset.clave;
-    if (!nombre || !clave || !Number.isFinite(precio) || precio < 0) return;
-    if (!carrito.some(function (p) { return p.clave === clave; })) {
-      carrito.push({ clave: clave, nombre: nombre.textContent, precio: precio });
+    var stock = Number(agregar.dataset.stock);
+    var referencia = agregar.dataset.clave;
+    if (!nombre || !referencia || !Number.isFinite(precio) || precio < 0 ||
+        !Number.isSafeInteger(stock) || stock < 1) return;
+    var existente = carrito.find(function (p) { return p.referencia === referencia; });
+    var cantidadSolicitada = (existente ? existente.cantidad : 0) + 1;
+    if (cantidadSolicitada > stock) {
+      if (avisoTarjeta) {
+        avisoTarjeta.hidden = false;
+        avisoTarjeta.textContent = "Stock insuficiente: solicitas " + cantidadSolicitada + " y solo hay " + stock + " " + (stock===1?"unidad disponible.":"unidades disponibles.");
+      }
+      return;
     }
+    if (existente) { existente.cantidad = cantidadSolicitada; existente.precio = precio; existente.nombre = nombre.textContent; }
+    else carrito.push({ referencia:referencia, nombre:nombre.textContent, precio:precio, cantidad:1 });
+    if (avisoTarjeta) { avisoTarjeta.hidden = false; avisoTarjeta.textContent = "Añadido al carrito: " + cantidadSolicitada + " " + (cantidadSolicitada===1?"unidad.":"unidades."); }
     pintar();
-    // El catálogo permanece visible; el carrito se consulta en su propia página.
-    agregar.textContent = "Añadido a la demostración";
-    agregar.disabled = true;
   });
   pintar();
 })();
