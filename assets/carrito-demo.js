@@ -1,41 +1,38 @@
 (function () {
   "use strict";
-  // Demostración local: no envía pedidos, reserva existencias ni cobra dinero.
+  // El carrito es exclusivamente visual. Sin ID único ni stock confirmado NO se permite
+  // incrementar cantidades ni tramitar pedidos. No se escribe en el inventario.
   var carrito = [];
-  var boton = document.getElementById("abrir-carrito-demo");
-  var panel = document.getElementById("carrito-demo-panel");
   var lista = document.getElementById("carrito-demo-lista");
   var total = document.getElementById("carrito-demo-total");
   var contador = document.getElementById("carrito-demo-contador");
-  if (!boton || !panel || !lista || !total || !contador) return;
-  var formato = new Intl.NumberFormat("es-ES", {style:"currency",currency:"EUR"});
+  var aviso = document.getElementById("carrito-demo-aviso");
+  var formato = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" });
+  if (!lista || !total || !contador) return;
+
+  function escapar(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
   function pintar() {
     lista.replaceChildren();
     var importe = 0;
-    var cantidad = 0;
-    carrito.forEach(function (p, i) {
-      importe += p.precio * p.cantidad;
-      cantidad += p.cantidad;
+    carrito.forEach(function (p) {
+      importe += p.precio;
       var fila = document.createElement("li");
       fila.className = "carrito-demo-item";
       var nombre = document.createElement("span");
       nombre.textContent = p.nombre + " · " + formato.format(p.precio) + " (IVA incl.)";
-      var controles = document.createElement("span");
-      controles.className = "carrito-demo-controles";
-      var menos = document.createElement("button");
-      menos.type = "button";
-      menos.textContent = "−";
-      menos.setAttribute("aria-label", "Quitar una unidad de " + p.nombre);
-      menos.addEventListener("click", function () { p.cantidad--; if (p.cantidad === 0) carrito.splice(i, 1); pintar(); });
-      var unidades = document.createElement("span");
-      unidades.textContent = String(p.cantidad);
-      var mas = document.createElement("button");
-      mas.type = "button";
-      mas.textContent = "+";
-      mas.setAttribute("aria-label", "Añadir una unidad de " + p.nombre);
-      mas.addEventListener("click", function () { p.cantidad++; pintar(); });
-      controles.append(menos, unidades, mas);
-      fila.append(nombre, controles);
+      var eliminar = document.createElement("button");
+      eliminar.type = "button";
+      eliminar.className = "carrito-demo-eliminar";
+      eliminar.textContent = "Eliminar";
+      eliminar.setAttribute("aria-label", "Eliminar " + p.nombre + " del carrito");
+      eliminar.addEventListener("click", function () {
+        carrito = carrito.filter(function (item) { return item.clave !== p.clave; });
+        pintar();
+      });
+      fila.append(nombre, eliminar);
       lista.append(fila);
     });
     if (!carrito.length) {
@@ -43,31 +40,37 @@
       vacio.textContent = "Tu carrito de demostración está vacío.";
       lista.append(vacio);
     }
-    contador.textContent = String(cantidad);
+    contador.textContent = String(carrito.length);
     total.textContent = formato.format(importe);
+    if (aviso) aviso.textContent = "Vista de prueba: no se puede confirmar el stock ni comprar. Cada producto se muestra una sola vez hasta que Kelatos facilite su referencia y existencias verificables.";
+    try { sessionStorage.setItem("doncargador_carrito_demo", JSON.stringify(carrito)); } catch (e) {}
   }
-  boton.addEventListener("click", function () {
-    panel.hidden = !panel.hidden;
-    boton.setAttribute("aria-expanded", String(!panel.hidden));
-    if (!panel.hidden) panel.focus();
-  });
+
+  try {
+    var anterior = JSON.parse(sessionStorage.getItem("doncargador_carrito_demo") || "[]");
+    // Los datos del navegador no son un pedido ni una fuente fiable de precios o stock.
+    if (Array.isArray(anterior)) carrito = anterior.filter(function (p) {
+      return p && typeof p.clave === "string" && typeof p.nombre === "string" &&
+        typeof p.precio === "number" && Number.isFinite(p.precio) && p.precio >= 0;
+    }).slice(0, 50).map(function (p) { return { clave: p.clave, nombre: p.nombre, precio: p.precio }; });
+    carrito = carrito.filter(function (p, i) { return carrito.findIndex(function (x) { return x.clave === p.clave; }) === i; });
+  } catch (e) {}
+
   document.addEventListener("click", function (evento) {
     var agregar = evento.target.closest("[data-agregar-carrito-demo]");
     if (!agregar) return;
     var tarjeta = agregar.closest(".cargador-card");
-    if (!tarjeta) return;
-    var nombre = tarjeta.querySelector(".cargador-nombre");
+    var nombre = tarjeta && tarjeta.querySelector(".cargador-nombre");
     var precio = Number(agregar.dataset.precio);
-    if (!nombre || !Number.isFinite(precio) || precio < 0) return;
-    // El endpoint actual carece de identificadores únicos: la clave provisional
-    // únicamente sirve para agrupar productos en este carrito de demostración.
     var clave = agregar.dataset.clave;
-    var existente = carrito.find(function (p) { return p.clave === clave; });
-    if (existente) existente.cantidad++;
-    else carrito.push({clave:clave,nombre:nombre.textContent,precio:precio,cantidad:1});
+    if (!nombre || !clave || !Number.isFinite(precio) || precio < 0) return;
+    if (!carrito.some(function (p) { return p.clave === clave; })) {
+      carrito.push({ clave: clave, nombre: nombre.textContent, precio: precio });
+    }
     pintar();
-    panel.hidden = false;
-    boton.setAttribute("aria-expanded", "true");
+    // El catálogo permanece visible; el carrito se consulta en su propia página.
+    agregar.textContent = "Añadido a la demostración";
+    agregar.disabled = true;
   });
   pintar();
 })();
