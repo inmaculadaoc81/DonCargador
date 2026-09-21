@@ -3,18 +3,30 @@
   const CLAVE='doncargador_carrito_v1';
   const lista=document.getElementById('lineas-carrito');
   const subtotal=document.getElementById('subtotal');
+  const resumenEntrega=document.getElementById('resumen-entrega');
+  const totalEstimado=document.getElementById('total-estimado');
   const formulario=document.getElementById('formulario-compra');
   const boton=document.getElementById('boton-pagar');
   const estado=document.getElementById('estado-compra');
+  const datosEnvio=document.getElementById('datos-envio');
+  const datosRecogida=document.getElementById('datos-recogida');
+  const ENVIO_CENTIMOS=1500; // Solo presentación; el servidor valida y recalcula el importe.
   let catalogo=new Map();let carrito=[];let disponible=false;
   function dinero(n){return Number(n).toLocaleString('es-ES',{style:'currency',currency:'EUR'});}
   function escapar(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
   function cargar(){try{const x=JSON.parse(localStorage.getItem(CLAVE)||'[]');return Array.isArray(x)?x.filter(y=>y&&typeof y.referencia==='string'&&Number.isInteger(y.cantidad)&&y.cantidad>0&&y.cantidad<=20).slice(0,20):[];}catch{return [];}}
   function guardar(){try{localStorage.setItem(CLAVE,JSON.stringify(carrito));}catch{estado.textContent='No se puede guardar el carrito en este navegador.';}}
+  function entregaElegida(){return formulario.elements.entrega.value==='envio'?'envio':'recogida';}
+  function actualizarEntrega(){
+    const envio=entregaElegida()==='envio';
+    datosEnvio.hidden=!envio;datosRecogida.hidden=envio;
+    datosEnvio.querySelectorAll('input').forEach(input=>{input.disabled=!envio;input.required=envio&&input.name!=='pais';});
+    pintar();
+  }
   function pintar(){
     const validas=carrito.filter(x=>catalogo.has(x.referencia));
     disponible=carrito.length>0&&validas.length===carrito.length;
-    if(!carrito.length){lista.textContent='Tu carrito está vacío. Vuelve al catálogo para elegir un cargador.';subtotal.textContent='';}
+    if(!carrito.length){lista.textContent='Tu carrito está vacío. Vuelve al catálogo para elegir un cargador.';subtotal.textContent='';resumenEntrega.textContent='';totalEstimado.textContent='';}
     else{
       lista.innerHTML=carrito.map(l=>{
         const p=catalogo.get(l.referencia);
@@ -22,7 +34,11 @@
           '<label>Cantidad <input type="number" min="1" max="20" step="1" value="'+l.cantidad+'" data-cantidad="'+escapar(l.referencia)+'" aria-label="Cantidad de '+escapar(p?.nombre||'producto')+'"></label>'+
           '<button type="button" data-quitar="'+escapar(l.referencia)+'">Quitar</button><span class="precio">'+(p?dinero(Number(p.precio)*l.cantidad):'Sin existencias')+'</span></div>';
       }).join('');
-      subtotal.textContent='Subtotal de productos: '+dinero(validas.reduce((n,l)=>n+Number(catalogo.get(l.referencia).precio)*l.cantidad,0));
+      const productos=validas.reduce((n,l)=>n+Math.round(Number(catalogo.get(l.referencia).precio)*100)*l.cantidad,0);
+      const envio=entregaElegida()==='envio'?ENVIO_CENTIMOS:0;
+      subtotal.textContent='Productos: '+dinero(productos/100);
+      resumenEntrega.textContent=envio?'Envío (IVA incluido): '+dinero(envio/100):'Recogida en local: gratis';
+      totalEstimado.textContent=disponible?'Total estimado: '+dinero((productos+envio)/100):'Total pendiente de disponibilidad';
     }
     boton.disabled=!cfg.pagosHabilitados||!disponible;
     boton.textContent=cfg.pagosHabilitados?'Continuar al pago':'Pago online en preparación';
@@ -41,8 +57,9 @@
     const b=e.target.closest('button[data-quitar]');if(!b)return;
     carrito=carrito.filter(x=>x.referencia!==b.dataset.quitar);guardar();pintar();
   });
+  formulario.addEventListener('change',e=>{if(e.target.name==='entrega')actualizarEntrega();});
   async function iniciar(){
-    carrito=cargar();
+    carrito=cargar();actualizarEntrega();
     try{
       const r=await fetch(cfg.apiOrigen+'/publico/piezas-cargador',{cache:'no-store'});
       if(!r.ok)throw new Error('Sin inventario');
@@ -56,11 +73,16 @@
     e.preventDefault();if(!cfg.pagosHabilitados||!disponible||boton.disabled)return;
     boton.disabled=true;estado.textContent='Confirmando disponibilidad y precio…';
     const datos=new FormData(formulario);
+    const entrega=entregaElegida();
     const comprador=Object.fromEntries(['nombre','email','telefono','direccion','codigoPostal','ciudad','provincia','pais'].map(k=>[k,String(datos.get(k)||'').trim()]));
+    if(entrega==='recogida'){
+      for(const k of ['direccion','codigoPostal','ciudad','provincia'])comprador[k]='';
+      comprador.pais='ES';
+    }
     try{
       const r=await fetch(cfg.apiOrigen+'/publico/doncargador/pedidos',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({requestId:crypto.randomUUID(),comprador,
+        body:JSON.stringify({requestId:crypto.randomUUID(),entrega,comprador,
           lineas:carrito.map(x=>({referencia:x.referencia,cantidad:x.cantidad}))})});
       const d=await r.json();if(!r.ok||!d.ok||!d.formulario)throw new Error(d.error||'No se pudo iniciar el pago');
       const f=d.formulario;
@@ -72,8 +94,8 @@
       if(!Number.isSafeInteger(centimos)||centimos<=0)throw new Error('Importe no válido');
       const productos=carrito.reduce((n,l)=>n+Math.round(Number(catalogo.get(l.referencia).precio)*100)*l.cantidad,0);
       const envio=centimos-productos;
-      // El usuario ve el importe REAL firmado en el servidor, no el del carrito.
-      if(!confirm('Productos: '+dinero(productos/100)+'\nEnvío y ajustes: '+dinero(envio/100)+
+      const entregaTexto=entrega==='envio'?'Envío a domicilio':'Recogida en C/ Joaquín María López, 26, Madrid';
+      if(!confirm('Productos estimados: '+dinero(productos/100)+'\n'+entregaTexto+'\nEntrega y posibles cambios de precio: '+dinero(envio/100)+
         '\nTOTAL A PAGAR: '+dinero(centimos/100)+'\n\n¿Confirmas que quieres ir a Redsys para pagar?')){
         estado.textContent='Pago no iniciado. Tu carrito sigue guardado.';return;
       }
