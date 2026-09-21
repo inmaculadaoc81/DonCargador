@@ -1,11 +1,12 @@
--- DonCargador 006. REVISAR Y APROBAR ANTES DE EJECUTAR. NO ES LA MIGRACION 005 DE PRUEBAS.
--- Nunca ejecutar automáticamente desde la web ni desde Docker build.
+-- DonCargador 006: esquema REAL, sin reservas, distinto de 005 (funciones dc_test_*).
+-- NO ejecutar automáticamente. Requiere revisión, backup, autorización y acceso de propietario.
+-- Puede aplicarse primero a una BD NUEVA y AISLADA llamada doncargador_redsys_pruebas.
 \set ON_ERROR_STOP on
 BEGIN;
 DO $guard$
 BEGIN
-  IF current_database() <> 'kelatos' THEN
-    RAISE EXCEPTION '006: solo destinada a kelatos; requiere revisión y autorización';
+  IF current_database() NOT IN ('kelatos','doncargador_redsys_pruebas') THEN
+    RAISE EXCEPTION '006: base de datos no autorizada; NO usar doncargador_pruebas ni otras';
   END IF;
   IF EXISTS (
     SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -36,7 +37,7 @@ CREATE TABLE kelatos_app.dc_pedido_lineas (
   referencia text NOT NULL REFERENCES kelatos_app.stock_piezas(referencia)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
   nombre text NOT NULL,
-  cantidad integer NOT NULL CHECK (cantidad BETWEEN 1 AND 100),
+  cantidad integer NOT NULL CHECK (cantidad BETWEEN 1 AND 20),
   precio_unitario numeric(12,2) NOT NULL CHECK (precio_unitario > 0),
   PRIMARY KEY (pedido_id,referencia)
 );
@@ -59,7 +60,7 @@ CREATE TABLE kelatos_app.dc_intentos (
 );
 CREATE INDEX dc_intentos_pedido_idx ON kelatos_app.dc_intentos(pedido_id);
 
--- Bandeja de avisos. Un error SMTP no deshace el cobro.
+-- Bandeja transaccional de avisos. Un fallo SMTP NO deshace el pago.
 CREATE TABLE kelatos_app.dc_avisos (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   pedido_id uuid NOT NULL REFERENCES kelatos_app.dc_pedidos(id) ON DELETE RESTRICT,
@@ -75,7 +76,10 @@ CREATE TABLE kelatos_app.dc_avisos (
 );
 CREATE INDEX dc_avisos_pendientes_idx ON kelatos_app.dc_avisos(estado,creado_en);
 
--- Autorización mínima para API: sin DDL ni DELETE. Usar rol propietario para migrar.
+-- Evitar que los privilegios por defecto del esquema otorguen DELETE o PUBLIC.
+REVOKE ALL ON kelatos_app.dc_pedidos,kelatos_app.dc_pedido_lineas,
+  kelatos_app.dc_intentos,kelatos_app.dc_avisos FROM PUBLIC,kelatos_api;
+REVOKE ALL ON SEQUENCE kelatos_app.dc_avisos_id_seq FROM PUBLIC,kelatos_api;
 GRANT SELECT,INSERT,UPDATE ON kelatos_app.dc_pedidos,kelatos_app.dc_pedido_lineas,
   kelatos_app.dc_intentos,kelatos_app.dc_avisos TO kelatos_api;
 GRANT USAGE,SELECT ON SEQUENCE kelatos_app.dc_avisos_id_seq TO kelatos_api;
