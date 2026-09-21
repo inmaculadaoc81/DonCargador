@@ -1,4 +1,5 @@
 (function () {
+  "use strict";
   // Catálogo público de Kelatos. No modifica existencias ni procesa pagos.
   var ENDPOINT = "https://makeup-reef-raymond-holes.trycloudflare.com/publico/piezas-cargador";
   var contenedor = document.getElementById("cargadores-lista");
@@ -60,7 +61,7 @@
     }
     function actualizar() {
       var termino=normalizar(busqueda?busqueda.value:"");
-      if(filtros)Array.from(filtros.children).forEach(function(b){b.setAttribute("aria-pressed",b.textContent===activa?"true":"false";});
+      if(filtros)Array.from(filtros.children).forEach(function(b){b.setAttribute("aria-pressed",b.textContent===activa?"true":"false");});
       var visibles=piezas.map(function(p){return {p:p};}).filter(function(item){
         return (activa==="Todas"||marcaDe(item.p)===activa)&&normalizar([item.p.nombre,item.p.descripcion,marcaDe(item.p)].join(" ")).includes(termino);
       });
