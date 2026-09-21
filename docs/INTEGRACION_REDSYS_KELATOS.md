@@ -1,37 +1,30 @@
-# DonCargador — integración del TPV de Kelatos (borrador, sin cobros)
+# DonCargador — TPV de Kelatos / Getnet (revisión, sin cobros)
 
-**Estado:** código criptográfico inicial en una rama separada. Este trabajo no activa pagos ni modifica la API de Kelatos ni PostgreSQL.
+**Estado real:** módulos de pago, pedidos, carrito, callbacks y avisos creados en esta rama. **No están instalados en el VPS, no se ha ejecutado la migración 006 y el pago en el navegador sigue desactivado.** No fusionar el PR como si fuera una tienda lista para cobrar.
 
-## Lo comprobado
+## Verificado previamente
 
-- La API de Kelatos expone `GET /publico/piezas-cargador`, que ya devuelve la `referencia` única de las piezas; se verificó HTTP 200, 29 productos y una referencia después de reconstruir y recrear el contenedor.
-- El catálogo web actual (`assets/cargadores.js`) solo consulta y muestra piezas; aún no tiene compra operativa.
-- El TPV virtual de Getnet/Santander de Kelatos figura activo en capturas del portal. Su configuración mostraba «Notificación online: Email Comercio» y la URL de notificación vacía; no se ha modificado.
-- La migración 005 está aplicada **solo** a `doncargador_pruebas`: sus funciones `dc_test_*` simulan la confirmación; **no deben invocarse desde la web ni ejecutarse en producción**.
-- El usuario aportó «TPV-Virtual Manual de Integración - Redirección», versión 3.2 (31/01/2024). La página 9 documenta el formulario `Ds_SignatureVersion`, `Ds_MerchantParameters` y `Ds_Signature`; las páginas 12–13 describen la firma y la validación de notificaciones.
+- Catálogo público de Kelatos `GET /publico/piezas-cargador`: HTTP 200, 29 productos y referencias de producto presentes después de reconstruir el contenedor.
+- TPV Getnet/Santander de Kelatos: activo en capturas, sin cambiar sus ajustes. La notificación mostrada era «Email Comercio» con URL de notificación vacía.
+- El archivo SQL 005 y `dc_test_*` solo existen en `doncargador_pruebas` y simulan pagos: no utilizarlos con el TPV ni copiarlos a producción.
+- Manual aportado por el titular: «TPV-Virtual Manual de Integración - Redirección», versión 3.2, 31/01/2024; formulario HMAC_SHA256_V1 con `Ds_SignatureVersion`, `Ds_MerchantParameters`, `Ds_Signature`, y notificación firmada.
 
-## Implementado en esta rama (sin integración ni despliegue)
+## Cambios en el PR
 
-- `lib/redsys.js`: utilidades de **servidor** para codificar y firmar parámetros de redirección `HMAC_SHA256_V1` con clave por operación derivada mediante 3DES, y comprobar en tiempo constante la firma de una notificación. No incorpora credenciales ni URL de cobro, no consulta ni cambia el inventario y no expone rutas HTTP.
-- `tests/redsys.test.js`: pruebas unitarias para creación de campos, firma válida, manipulación de importe/firma, versión inválida, formato de claves y firma URL-safe. Ejecutar localmente con Node 22+ mediante `node --test tests/redsys.test.js`. **Estas pruebas se han añadido, pero todavía no se ha comprobado su ejecución en este entorno.**
-- **Importante:** una firma válida por sí sola NO acredita que se deba entregar un pedido. Falta comprobar comercio, terminal, referencia bancaria, identificador del pedido, importe, moneda, tipo y resultado comparándolos con registros persistidos.
+- `lib/redsys.js`, `lib/redsys-formulario.js`, `lib/redsys-pedido.js`: formulario y firma 3DES + HMAC SHA256, validación de firma y de comercio, terminal, pedido, importe, moneda, operación y respuesta.
+- `backend/doncargador/servicio.js`: pedido e intento persistidos con idempotencia de solicitud, precio calculado en PostgreSQL, exclusión Dyson, confirmación solo por notificación verificada, descuento transaccional con bloqueo de todas las referencias, aviso de pedido pagado o falta de stock.
+- `backend/doncargador/router.js`: endpoints públicos aislados con limitación de solicitudes; desactivados por defecto.
+- `backend/doncargador/avisos.js` e `instalar.js`: cola de avisos SMTP con reintentos y activación controlada. Correo al menos una vez (posible duplicado en un fallo excepcional después de SMTP).
+- `backend/migrations/006_doncargador_produccion.sql`: DDL nuevo, aún **NO ejecutado**. Permite solamente `kelatos` o una nueva BD aislada `doncargador_redsys_pruebas` sin tablas dc_ previas.
+- `catalogo.html`, `carrito.html`, `pago-ok.html`, `pago-ko.html`, `assets/*.js`: carrito por referencia, formulario de envío, presentación del total firmado antes de redirigir, y consulta posterior del estado en servidor. `assets/compra-config.js` mantiene `pagosHabilitados:false` y URL API temporal.
+- Pruebas automáticas con Node 24 en `.github/workflows/redsys-tests.yml`, con vector público oficial HMAC SHA256 además de pruebas de validación y cierre seguro. Pasar estas pruebas **no sustituye** las pruebas contra Getnet ni PostgreSQL.
 
-## Diseño previsto (pendiente de implementación y revisión)
+## Bloqueos para habilitar pagos reales
 
-1. Preparar un módulo separado de pedidos y Redsys en el backend de Kelatos, sin publicar credenciales y sin habilitar una ruta de cobro mientras falten verificaciones.
-2. Definir migración **nueva, específica de producción**, con aprobación expresa y copia de seguridad previa: pedidos, líneas, intentos de pago y bandeja de avisos. Identificador del intento compatible con el formato de número de pedido de Redsys; correspondencia única entre identificador, pedido, importe y terminal. No copiar la migración 005 de pruebas a producción.
-3. El servidor recalcula precios, disponibilidad y total desde `stock_piezas`, valida cantidades y referencias y excluye productos Dyson. El navegador **nunca** decide el importe ni el estado de pago.
-4. Con la clave de firma del **terminal de Kelatos**, almacenada exclusivamente en el entorno del servidor, generar el formulario de redirección y sus parámetros firmados. **No almacenar claves en este repositorio público, Vercel o mensajes del chat**. Obtener las credenciales de prueba específicas del terminal o emplear exclusivamente datos genéricos de pruebas en un entorno aislado.
-5. Crear un endpoint HTTPS público de notificaciones: validar firma en tiempo constante, versión, comercio, terminal, pedido/operación, tipo, moneda, importe y resultado. Registrar identidad única de transacción y evitar procesar dos veces la misma confirmación. Los retornos OK/KO del navegador **no acreditan el cobro**.
-6. Tras confirmación auténtica, descontar las existencias de **todas** las líneas en una transacción con bloqueo ordenado y condiciones de stock, o no descontar ninguna. Sin reservas, dos compradores podrían pagar por la última unidad: el segundo pedido pasa a revisión y devolución; **nunca** se prometen existencias garantizadas antes de pagar.
-7. Registrar el correo a Kelatos en bandeja transaccional y enviarlo con reintentos y control de duplicados. Un error SMTP no debe revertir un pago ya confirmado.
-8. Habilitar el botón «Pagar» solo después de probar solicitud, firma, respuesta, cancelación, reintento, callback duplicado, concurrencia, avisos y plan de devolución, y de verificar la autorización del uso del TPV de Kelatos para `cargadordeportatil.es`.
+- Clave de firma privada, FUC y terminal exactos; establecerlos solo en el entorno del VPS.
+- Dominio HTTPS **estable** para API y callback (no usar hostname temporal `trycloudflare.com`).
+- Confirmación de Getnet sobre uso del TPV de Kelatos en `cargadordeportatil.es` y sobre notificación HTTP **sin romper la operativa actual de Kelatos/Paygold**.
+- Precio de envío confirmado en céntimos (IVA incluido), ámbito de reparto (por ahora ES) y política de devolución.
+- Revisión e instalación manual de código en `api/src`, nueva BD aislada de pruebas compatible con SQL 006, pruebas reales en sandbox, validación del proceso de avisos, despliegue controlado y autorización explícita antes de cobrar.
 
-## Pendiente antes de publicar
-
-- Revisar el backend real y su esquema SQL de producción para definir una migración compatible y un endpoint estable para las notificaciones.
-- Localizar la clave de firma sin mostrarla ni enviarla al chat; configurar credenciales y URL pública segura de forma privada.
-- Confirmar con Getnet/Santander las condiciones de uso del TPV en el dominio adicional y configurar notificación **servidor a servidor**, actualmente no configurada según la captura.
-- Integrar código con backend y web, ejecutar pruebas de extremo a extremo y obtener autorización del usuario para activar cobros reales.
-
-**No fusionar esta rama ni desplegar cobros como consecuencia de este documento.**
+Ver `backend/README.md` para la estructura de instalación, las variables privadas y las comprobaciones previas. **Sin reservas**: dos clientes pueden pagar por la última unidad; el segundo debe ir a revisión y devolución manual, no se promete prevenir un doble cobro.
