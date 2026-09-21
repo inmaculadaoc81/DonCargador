@@ -22,6 +22,11 @@
     if (precio == null || precio === "" || !Number.isFinite(Number(precio)) || Number(precio) < 0) return "Consultar precio";
     return Number(precio).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2}) + " € IVA inc.";
   }
+  function stockDe(p) {
+    var s = Number(p.stock);
+    return p.stock != null && p.stock !== "" && Number.isSafeInteger(s) && s >= 0 ? s : null;
+  }
+  function referenciaDe(p) { return p.referencia == null ? "" : String(p.referencia).trim(); }
   function imagenDe(p) {
     if (!p.imagen_url) return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
     try {
@@ -29,13 +34,15 @@
       return '<img class="cargador-imagen" src="'+escapeHtml(url.href)+'" alt="'+escapeHtml(p.nombre)+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="cargador-imagen-placeholder" hidden aria-hidden="true">DC</span>';
     } catch(e) { return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>'; }
   }
-  function tarjeta(p,indice) {
+  function tarjeta(p) {
     var descripcion = p.descripcion ? '<p class="cargador-desc">'+escapeHtml(p.descripcion)+'</p>' : "";
     var precio = Number(p.precio);
     var precioValido = p.precio != null && p.precio !== "" && Number.isFinite(precio) && precio >= 0;
-    // Índice temporal solo para demostrar el flujo; NO sirve para identificar ventas.
-    var boton = precioValido ? '<button type="button" class="cargador-demo-btn" data-agregar-carrito-demo data-clave="demo-'+indice+'" data-precio="'+precio+'">Añadir a la demostración</button>' : '';
-    return '<article class="cargador-card">'+imagenDe(p)+'<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(p))+'</div><h4 class="cargador-nombre">'+escapeHtml(p.nombre||"Cargador")+'</h4>'+descripcion+'<div class="cargador-precio">'+euros(p.precio)+'</div>'+boton+'</div></article>';
+    var stock = stockDe(p), referencia = referenciaDe(p);
+    var stockTexto = stock === null ? "Stock no disponible" : "Disponibles: "+stock+" "+(stock === 1 ? "unidad" : "unidades");
+    var disponible = precioValido && stock !== null && stock > 0 && referencia !== "";
+    var boton = '<button type="button" class="cargador-demo-btn" data-agregar-carrito-demo data-clave="'+escapeHtml(referencia)+'"'+(disponible?'':' disabled')+'>'+(disponible?'Añadir al carrito de prueba':'No disponible para añadir')+'</button>';
+    return '<article class="cargador-card">'+imagenDe(p)+'<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(p))+'</div><h4 class="cargador-nombre">'+escapeHtml(p.nombre||"Cargador")+'</h4>'+descripcion+'<div class="cargador-precio">'+euros(p.precio)+'</div><p class="cargador-stock" aria-label="Existencias disponibles">'+escapeHtml(stockTexto)+'</p>'+boton+'</div></article>';
   }
   function mostrar(piezas) {
     var filtros = document.getElementById("cargadores-filtros");
@@ -45,18 +52,19 @@
     if (filtros) {
       filtros.innerHTML = "";
       ["Todas"].concat(marcas).forEach(function(marca){
-        var boton = document.createElement("button"); boton.type="button";boton.className="cargadores-filtro";boton.textContent=marca;
+        var boton = document.createElement("button");
+        boton.type="button";boton.className="cargadores-filtro";boton.textContent=marca;
         boton.setAttribute("aria-pressed",marca===activa?"true":"false");
         boton.addEventListener("click",function(){activa=marca;actualizar();});filtros.appendChild(boton);
       });
     }
     function actualizar() {
       var termino=normalizar(busqueda?busqueda.value:"");
-      if(filtros)Array.from(filtros.children).forEach(function(b){b.setAttribute("aria-pressed",b.textContent===activa?"true":"false");});
-      var visibles=piezas.map(function(p,indice){return {p:p,indice:indice};}).filter(function(item){
+      if(filtros)Array.from(filtros.children).forEach(function(b){b.setAttribute("aria-pressed",b.textContent===activa?"true":"false";});
+      var visibles=piezas.map(function(p){return {p:p};}).filter(function(item){
         return (activa==="Todas"||marcaDe(item.p)===activa)&&normalizar([item.p.nombre,item.p.descripcion,marcaDe(item.p)].join(" ")).includes(termino);
       });
-      contenedor.innerHTML=visibles.length?visibles.map(function(item){return tarjeta(item.p,item.indice);}).join(""):'<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
+      contenedor.innerHTML=visibles.length?visibles.map(function(item){return tarjeta(item.p);}).join(""):'<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
     }
     if(busqueda)busqueda.addEventListener("input",actualizar);
     actualizar();
