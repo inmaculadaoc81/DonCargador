@@ -42,8 +42,8 @@
     var stock = stockDe(p), referencia = referenciaDe(p);
     var stockTexto = stock === null ? "Stock no disponible" : "Disponibles: "+stock+" "+(stock === 1 ? "unidad" : "unidades");
     var disponible = precioValido && stock !== null && stock > 0 && referencia !== "";
-    var boton = '<button type="button" class="cargador-demo-btn" data-agregar-carrito-demo data-clave="'+escapeHtml(referencia)+'"'+(disponible?'':' disabled')+'>'+(disponible?'Añadir al carrito de prueba':'No disponible para añadir')+'</button>';
-    return '<article class="cargador-card">'+imagenDe(p)+'<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(p))+'</div><h4 class="cargador-nombre">'+escapeHtml(p.nombre||"Cargador")+'</h4>'+descripcion+'<div class="cargador-precio">'+euros(p.precio)+'</div><p class="cargador-stock" aria-label="Existencias disponibles">'+escapeHtml(stockTexto)+'</p>'+boton+'</div></article>';
+    var boton = '<button type="button" class="cargador-demo-btn" data-agregar-carrito-demo data-clave="'+escapeHtml(referencia)+'" data-precio="'+(precioValido?precio:'')+'" data-stock="'+(stock===null?'':stock)+'"'+(disponible?'':' disabled')+'>'+(disponible?'Añadir al carrito de prueba':'No disponible para añadir')+'</button>';
+    return '<article class="cargador-card">'+imagenDe(p)+'<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(p))+'</div><h4 class="cargador-nombre">'+escapeHtml(p.nombre||"Cargador")+'</h4>'+descripcion+'<div class="cargador-precio">'+euros(p.precio)+'</div><p class="cargador-stock" aria-label="Existencias disponibles">'+escapeHtml(stockTexto)+'</p><p class="cargador-stock-aviso" role="status" hidden></p>'+boton+'</div></article>';
   }
   function mostrar(piezas) {
     var filtros = document.getElementById("cargadores-filtros");
@@ -62,10 +62,10 @@
     function actualizar() {
       var termino=normalizar(busqueda?busqueda.value:"");
       if(filtros)Array.from(filtros.children).forEach(function(b){b.setAttribute("aria-pressed",b.textContent===activa?"true":"false");});
-      var visibles=piezas.map(function(p){return {p:p};}).filter(function(item){
-        return (activa==="Todas"||marcaDe(item.p)===activa)&&normalizar([item.p.nombre,item.p.descripcion,marcaDe(item.p)].join(" ")).includes(termino);
+      var visibles=piezas.filter(function(p){
+        return (activa==="Todas"||marcaDe(p)===activa)&&normalizar([p.nombre,p.descripcion,marcaDe(p)].join(" ")).includes(termino);
       });
-      contenedor.innerHTML=visibles.length?visibles.map(function(item){return tarjeta(item.p);}).join(""):'<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
+      contenedor.innerHTML=visibles.length?visibles.map(tarjeta).join(""):'<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
     }
     if(busqueda)busqueda.addEventListener("input",actualizar);
     actualizar();
