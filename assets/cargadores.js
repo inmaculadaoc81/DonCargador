@@ -1,108 +1,119 @@
 (function () {
-  // Catálogo público de cargadores de Kelatos. No modifica existencias ni procesa pagos.
-  // Hasta que el backend publique una clasificación de destino, se excluyen explícitamente
-  // los cargadores Dyson. Una clasificación afirmativa para portátiles prevalecerá cuando exista.
-  var ENDPOINT = "https://makeup-reef-raymond-holes.trycloudflare.com/publico/piezas-cargador";
-  var contenedor = document.getElementById("cargadores-lista");
+  // Catálogo público. El navegador NO decide precio final ni confirma pagos.
+  const config = window.DONCARGADOR_COMPRA;
+  const ENDPOINT = config.apiOrigen + '/publico/piezas-cargador';
+  const CLAVE_CARRITO = 'doncargador_carrito_v1';
+  const contenedor = document.getElementById('cargadores-lista');
   if (!contenedor) return;
+  let piezasPorReferencia = new Map();
 
   function escapeHtml(valor) {
-    return String(valor == null ? "" : valor)
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    return String(valor == null ? '' : valor).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
-
   function normalizar(valor) {
-    return String(valor == null ? "" : valor)
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .toLocaleUpperCase("es-ES").trim();
+    return String(valor == null ? '' : valor).normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'').toLocaleUpperCase('es-ES').trim();
   }
-
   function esPortatil(pieza) {
-    if (!pieza || normalizar(pieza.categoria) !== "CARGADOR") return false;
-    // Campo futuro del backend: clasificacion_dispositivo = "PORTATIL".
-    // No se presupone que ya exista: mientras tanto se aplica una exclusión temporal.
-    var destino = normalizar(pieza.clasificacion_dispositivo || pieza.tipo_dispositivo);
-    if (destino) return destino === "PORTATIL" || destino === "PORTATILES";
-    return !/\bDYSON\b/.test(normalizar([pieza.nombre, pieza.descripcion].join(" ")));
+    if (!pieza || normalizar(pieza.categoria) !== 'CARGADOR') return false;
+    const destino = normalizar(pieza.clasificacion_dispositivo || pieza.tipo_dispositivo);
+    if (destino) return destino === 'PORTATIL' || destino === 'PORTATILES';
+    return !/\bDYSON\b/.test(normalizar([pieza.nombre,pieza.descripcion].join(' ')));
   }
-
   function marcaDe(pieza) {
-    var marca = String(pieza.marca || "").trim();
+    const marca = String(pieza.marca || '').trim();
     if (marca) return marca;
-    var nombre = normalizar(pieza.nombre);
-    // Se reconocen marcas del catálogo actual; las desconocidas permanecen visibles
-    // en «Otras marcas» hasta que el backend proporcione el campo marca.
-    var conocidas = ["HP", "ACER", "ASUS", "DELL", "LENOVO", "MSI", "SAMSUNG", "TOSHIBA", "MICROSOFT", "SURFACE", "APPLE", "LG", "HUAWEI", "GIGABYTE", "RAZER", "MEDION"];
-    return conocidas.find(function (item) { return new RegExp("\\b" + item + "\\b").test(nombre); }) || "Otras marcas";
+    const nombre = normalizar(pieza.nombre);
+    const conocidas = ['HP','ACER','ASUS','DELL','LENOVO','MSI','SAMSUNG','TOSHIBA','MICROSOFT','SURFACE','APPLE','LG','HUAWEI','GIGABYTE','RAZER','MEDION'];
+    return conocidas.find(item=>new RegExp('\\b'+item+'\\b').test(nombre)) || 'Otras marcas';
   }
-
   function euros(precio) {
-    if (precio == null || precio === "" || !Number.isFinite(Number(precio)) || Number(precio) < 0) return "Consultar precio";
-    return Number(precio).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " € IVA inc.";
+    if (precio == null || precio === '' || !Number.isFinite(Number(precio)) || Number(precio) <= 0) return 'Consultar precio';
+    return Number(precio).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' € IVA inc.';
   }
-
   function imagenDe(pieza) {
     if (!pieza.imagen_url) return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
     try {
-      var url = new URL(String(pieza.imagen_url), window.location.href);
-      if (url.protocol !== "https:") throw new Error("URL no segura");
-      return '<img class="cargador-imagen" src="' + escapeHtml(url.href) + '" alt="' + escapeHtml(pieza.nombre) + '" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="cargador-imagen-placeholder" hidden aria-hidden="true">DC</span>';
-    } catch (e) {
-      return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
-    }
+      const url = new URL(String(pieza.imagen_url),window.location.href);
+      if (url.protocol !== 'https:') throw new Error('URL no segura');
+      return '<img class="cargador-imagen" src="'+escapeHtml(url.href)+'" alt="'+escapeHtml(pieza.nombre)+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="cargador-imagen-placeholder" hidden aria-hidden="true">DC</span>';
+    } catch { return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>'; }
   }
-
+  function obtenerCarrito() {
+    try {
+      const datos=JSON.parse(localStorage.getItem(CLAVE_CARRITO)||'[]');
+      return Array.isArray(datos) ? datos.filter(x=>x && typeof x.referencia==='string' && Number.isSafeInteger(x.cantidad) && x.cantidad>0 && x.cantidad<=20).slice(0,20) : [];
+    } catch { return []; }
+  }
+  function guardarCarrito(carrito) {
+    try { localStorage.setItem(CLAVE_CARRITO,JSON.stringify(carrito)); return true; }
+    catch { alert('No se pudo guardar el carrito en este navegador.'); return false; }
+  }
+  function actualizarContador() {
+    const etiqueta=document.getElementById('carrito-contador');
+    if (etiqueta) etiqueta.textContent=String(obtenerCarrito().reduce((n,x)=>n+x.cantidad,0));
+  }
   function tarjeta(pieza) {
-    var descripcion = pieza.descripcion ? '<p class="cargador-desc">' + escapeHtml(pieza.descripcion) + '</p>' : "";
-    return '<article class="cargador-card">' + imagenDe(pieza) +
-      '<div class="cargador-body"><div class="cargador-categoria">' + escapeHtml(marcaDe(pieza)) + '</div>' +
-      '<h4 class="cargador-nombre">' + escapeHtml(pieza.nombre || "Cargador") + '</h4>' +
-      descripcion + '<div class="cargador-precio">' + euros(pieza.precio) + '</div></div></article>';
+    const descripcion=pieza.descripcion ? '<p class="cargador-desc">'+escapeHtml(pieza.descripcion)+'</p>' : '';
+    const comprable=typeof pieza.referencia==='string' && pieza.referencia.length>0 && Number(pieza.precio)>0;
+    const boton=comprable ? '<button type="button" class="cargador-anadir" data-referencia="'+escapeHtml(pieza.referencia)+'">Añadir al carrito</button>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
+    return '<article class="cargador-card">'+imagenDe(pieza)+
+      '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(pieza))+'</div>'+
+      '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+descripcion+
+      '<div class="cargador-precio">'+euros(pieza.precio)+'</div>'+boton+'</div></article>';
   }
-
   function mostrar(piezas) {
-    var filtros = document.getElementById("cargadores-filtros");
-    var busqueda = document.getElementById("cargadores-busqueda");
-    var marcas = Array.from(new Set(piezas.map(marcaDe))).sort(function (a, b) { return a.localeCompare(b, "es"); });
-    var activa = "Todas";
+    piezasPorReferencia=new Map(piezas.filter(p=>typeof p.referencia==='string').map(p=>[p.referencia,p]));
+    const filtros=document.getElementById('cargadores-filtros');
+    const busqueda=document.getElementById('cargadores-busqueda');
+    const marcas=Array.from(new Set(piezas.map(marcaDe))).sort((a,b)=>a.localeCompare(b,'es'));
+    let activa='Todas';
     if (filtros) {
-      filtros.innerHTML = '';
-      ["Todas"].concat(marcas).forEach(function (marca) {
-        var boton = document.createElement("button");
-        boton.type = "button";
-        boton.className = "cargadores-filtro";
-        boton.textContent = marca;
-        boton.setAttribute("aria-pressed", marca === activa ? "true" : "false");
-        boton.addEventListener("click", function () { activa = marca; actualizar(); });
-        filtros.appendChild(boton);
+      filtros.innerHTML='';
+      ['Todas'].concat(marcas).forEach(marca=>{
+        const boton=document.createElement('button');boton.type='button';boton.className='cargadores-filtro';
+        boton.textContent=marca;boton.setAttribute('aria-pressed',String(marca===activa));
+        boton.addEventListener('click',()=>{activa=marca;actualizar();});filtros.appendChild(boton);
       });
     }
     function actualizar() {
-      var termino = normalizar(busqueda ? busqueda.value : "");
-      if (filtros) Array.from(filtros.children).forEach(function (boton) { boton.setAttribute("aria-pressed", boton.textContent === activa ? "true" : "false"); });
-      var visibles = piezas.filter(function (pieza) {
-        return (activa === "Todas" || marcaDe(pieza) === activa) &&
-          normalizar([pieza.nombre, pieza.descripcion, marcaDe(pieza)].join(" ")).includes(termino);
-      });
-      contenedor.innerHTML = visibles.length ? visibles.map(tarjeta).join("") : '<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
+      const termino=normalizar(busqueda?busqueda.value:'');
+      if (filtros) Array.from(filtros.children).forEach(b=>b.setAttribute('aria-pressed',String(b.textContent===activa)));
+      const visibles=piezas.filter(p=>(activa==='Todas'||marcaDe(p)===activa)&&normalizar([p.nombre,p.descripcion,marcaDe(p)].join(' ')).includes(termino));
+      contenedor.innerHTML=visibles.length?visibles.map(tarjeta).join(''):'<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
     }
-    if (busqueda) busqueda.addEventListener("input", actualizar);
+    if (busqueda) busqueda.addEventListener('input',actualizar);
     actualizar();
   }
-
-  fetch(ENDPOINT, { cache: "no-store" })
-    .then(function (respuesta) { if (!respuesta.ok) throw new Error("HTTP " + respuesta.status); return respuesta.json(); })
-    .then(function (datos) {
-      if (!datos || datos.ok !== true || !Array.isArray(datos.piezas)) throw new Error("Respuesta de inventario inválida");
-      var piezas = datos.piezas.filter(esPortatil);
-      if (!piezas.length) {
-        contenedor.innerHTML = '<p class="cargadores-vacio">Ahora mismo no tenemos cargadores de portátil disponibles. Escríbenos para consultar existencias.</p>';
-        return;
-      }
+  contenedor.addEventListener('click',evento=>{
+    const boton=evento.target.closest('button[data-referencia]');
+    if (!boton||!contenedor.contains(boton)) return;
+    const referencia=boton.dataset.referencia;
+    if (!piezasPorReferencia.has(referencia)) return;
+    const carrito=obtenerCarrito();
+    let linea=carrito.find(x=>x.referencia===referencia);
+    if (linea) {
+      if (linea.cantidad>=20) {alert('Máximo 20 unidades por referencia.');return;}
+      linea.cantidad++;
+    } else {
+      if (carrito.length>=20) {alert('Máximo 20 referencias por pedido.');return;}
+      carrito.push({referencia,cantidad:1});
+    }
+    if (guardarCarrito(carrito)) {
+      actualizarContador();
+      const previo=boton.textContent;boton.textContent='Añadido al carrito';
+      setTimeout(()=>{if(boton.isConnected)boton.textContent=previo;},1200);
+    }
+  });
+  actualizarContador();
+  fetch(ENDPOINT,{cache:'no-store'})
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(d=>{
+      if(!d||d.ok!==true||!Array.isArray(d.piezas))throw new Error('Inventario inválido');
+      const piezas=d.piezas.filter(esPortatil);
+      if (!piezas.length) {contenedor.innerHTML='<p class="cargadores-vacio">Ahora mismo no tenemos cargadores de portátil disponibles.</p>';return;}
       mostrar(piezas);
     })
-    .catch(function () {
-      contenedor.innerHTML = '<p class="cargadores-vacio">No hemos podido consultar el inventario ahora mismo. Contacta con nosotros para confirmar la disponibilidad.</p>';
-    });
+    .catch(()=>{contenedor.innerHTML='<p class="cargadores-vacio">No hemos podido consultar el inventario. Contacta con nosotros para confirmar la disponibilidad.</p>';});
 })();
