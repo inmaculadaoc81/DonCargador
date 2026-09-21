@@ -53,12 +53,16 @@
     }
   }
 
-  function tarjeta(pieza) {
+  function tarjeta(pieza, indice) {
     var descripcion = pieza.descripcion ? '<p class="cargador-desc">' + escapeHtml(pieza.descripcion) + '</p>' : "";
+    var precio = Number(pieza.precio);
+    var precioValido = pieza.precio != null && pieza.precio !== "" && Number.isFinite(precio) && precio >= 0;
+    // Posición de la respuesta actual: identificador exclusivamente provisional para la demo.
+    var boton = precioValido ? '<button type="button" class="cargador-demo-btn" data-agregar-carrito-demo data-clave="demo-' + indice + '" data-precio="' + precio + '">Añadir al carrito de prueba</button>' : '';
     return '<article class="cargador-card">' + imagenDe(pieza) +
       '<div class="cargador-body"><div class="cargador-categoria">' + escapeHtml(marcaDe(pieza)) + '</div>' +
       '<h4 class="cargador-nombre">' + escapeHtml(pieza.nombre || "Cargador") + '</h4>' +
-      descripcion + '<div class="cargador-precio">' + euros(pieza.precio) + '</div></div></article>';
+      descripcion + '<div class="cargador-precio">' + euros(pieza.precio) + '</div>' + boton + '</div></article>';
   }
 
   function mostrar(piezas) {
@@ -81,11 +85,11 @@
     function actualizar() {
       var termino = normalizar(busqueda ? busqueda.value : "");
       if (filtros) Array.from(filtros.children).forEach(function (boton) { boton.setAttribute("aria-pressed", boton.textContent === activa ? "true" : "false"); });
-      var visibles = piezas.filter(function (pieza) {
-        return (activa === "Todas" || marcaDe(pieza) === activa) &&
-          normalizar([pieza.nombre, pieza.descripcion, marcaDe(pieza)].join(" ")).includes(termino);
+      var visibles = piezas.map(function (pieza, indice) { return { pieza: pieza, indice: indice }; }).filter(function (item) {
+        return (activa === "Todas" || marcaDe(item.pieza) === activa) &&
+          normalizar([item.pieza.nombre, item.pieza.descripcion, marcaDe(item.pieza)].join(" ")).includes(termino);
       });
-      contenedor.innerHTML = visibles.length ? visibles.map(tarjeta).join("") : '<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
+      contenedor.innerHTML = visibles.length ? visibles.map(function (item) { return tarjeta(item.pieza, item.indice); }).join("") : '<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
     }
     if (busqueda) busqueda.addEventListener("input", actualizar);
     actualizar();
