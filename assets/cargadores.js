@@ -1,5 +1,4 @@
 (function () {
-  // Catálogo público. El navegador NO decide precio final ni confirma pagos.
   const config = window.DONCARGADOR_COMPRA;
   const ENDPOINT = config.apiOrigen + '/publico/piezas-cargador';
   const CLAVE_CARRITO = 'doncargador_carrito_v1';
@@ -32,6 +31,10 @@
     if (precio == null || precio === '' || !Number.isFinite(Number(precio)) || Number(precio) <= 0) return 'Consultar precio';
     return Number(precio).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' € IVA inc.';
   }
+  function unidades(pieza) {
+    const n=Number(pieza.stock_disponible);
+    return Number.isSafeInteger(n) && n >= 0 ? n : null;
+  }
   function imagenDe(pieza) {
     if (!pieza.imagen_url) return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
     try {
@@ -56,12 +59,14 @@
   }
   function tarjeta(pieza) {
     const descripcion=pieza.descripcion ? '<p class="cargador-desc">'+escapeHtml(pieza.descripcion)+'</p>' : '';
-    const comprable=typeof pieza.referencia==='string' && pieza.referencia.length>0 && Number(pieza.precio)>0;
+    const stock=unidades(pieza);
+    const comprable=typeof pieza.referencia==='string' && pieza.referencia.length>0 && Number(pieza.precio)>0 && stock !== null && stock>0;
+    const stockTexto=stock === null ? 'Stock pendiente de confirmar' : 'Stock: '+stock+' '+(stock===1?'unidad':'unidades');
     const boton=comprable ? '<button type="button" class="cargador-anadir" data-referencia="'+escapeHtml(pieza.referencia)+'">Añadir al carrito</button>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
     return '<article class="cargador-card">'+imagenDe(pieza)+
       '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(pieza))+'</div>'+
       '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+descripcion+
-      '<div class="cargador-precio">'+euros(pieza.precio)+'</div>'+boton+'</div></article>';
+      '<div class="cargador-precio">'+euros(pieza.precio)+'</div><p class="cargador-stock">'+stockTexto+'</p>'+boton+'</div></article>';
   }
   function mostrar(piezas) {
     piezasPorReferencia=new Map(piezas.filter(p=>typeof p.referencia==='string').map(p=>[p.referencia,p]));
@@ -90,11 +95,14 @@
     const boton=evento.target.closest('button[data-referencia]');
     if (!boton||!contenedor.contains(boton)) return;
     const referencia=boton.dataset.referencia;
-    if (!piezasPorReferencia.has(referencia)) return;
+    const pieza=piezasPorReferencia.get(referencia);
+    if (!pieza) return;
+    const stock=unidades(pieza);
+    if (stock === null || stock<1) {alert('No se ha podido confirmar el stock de este cargador.');return;}
     const carrito=obtenerCarrito();
     let linea=carrito.find(x=>x.referencia===referencia);
     if (linea) {
-      if (linea.cantidad>=20) {alert('Máximo 20 unidades por referencia.');return;}
+      if (linea.cantidad>=Math.min(20,stock)) {alert('Solo hay '+stock+' unidades disponibles para esta referencia.');return;}
       linea.cantidad++;
     } else {
       if (carrito.length>=20) {alert('Máximo 20 referencias por pedido.');return;}
