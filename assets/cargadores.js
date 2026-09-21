@@ -1,9 +1,12 @@
 (function () {
-  const config = window.DONCARGADOR_COMPRA;
+  // Catálogo público. El navegador no decide precio final ni confirma pagos.
+  // La página principal no carga compra-config.js; usar el mismo endpoint HTTPS público.
+  const config = window.DONCARGADOR_COMPRA || {apiOrigen:'https://db.affirmatechnology.com/kelatos-api',pagosHabilitados:false};
   const ENDPOINT = config.apiOrigen + '/publico/piezas-cargador';
   const CLAVE_CARRITO = 'doncargador_carrito_v1';
   const contenedor = document.getElementById('cargadores-lista');
   if (!contenedor) return;
+  const esInicio = !document.getElementById('cargadores-busqueda');
   let piezasPorReferencia = new Map();
 
   function escapeHtml(valor) {
@@ -33,7 +36,7 @@
   }
   function unidades(pieza) {
     const n=Number(pieza.stock_disponible);
-    return Number.isSafeInteger(n) && n >= 0 ? n : null;
+    return pieza.stock_disponible !== null && pieza.stock_disponible !== undefined && Number.isSafeInteger(n) && n >= 0 ? n : null;
   }
   function imagenDe(pieza) {
     if (!pieza.imagen_url) return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
@@ -54,8 +57,25 @@
     catch { alert('No se pudo guardar el carrito en este navegador.'); return false; }
   }
   function actualizarContador() {
+    const total=obtenerCarrito().reduce((n,x)=>n+x.cantidad,0);
     const etiqueta=document.getElementById('carrito-contador');
-    if (etiqueta) etiqueta.textContent=String(obtenerCarrito().reduce((n,x)=>n+x.cantidad,0));
+    if (etiqueta) etiqueta.textContent=String(total);
+    const contadorInicio=document.getElementById('carrito-contador-inicio');
+    if (contadorInicio) contadorInicio.textContent=String(total);
+  }
+  function prepararInicio() {
+    if (!esInicio) return;
+    const seccion=document.getElementById('stock-disponible-ahora') || contenedor.parentElement;
+    if (!seccion || document.getElementById('carrito-enlace-inicio')) return;
+    const estilo=document.createElement('style');
+    estilo.textContent='#stock-disponible-ahora .cargador-body{display:flex;flex-direction:column;flex:1}#stock-disponible-ahora .cargador-card{display:flex;flex-direction:column}#stock-disponible-ahora .cargador-precio{margin-top:auto}#stock-disponible-ahora .cargador-stock{margin:8px 0;color:#286c32;font-weight:700}#stock-disponible-ahora .cargador-anadir{background:#123552;color:white;padding:12px 16px;border-radius:25px;font-weight:800;margin-top:9px}#stock-disponible-ahora .cargador-no-disponible{display:block;margin-top:8px}#carrito-enlace-inicio{display:inline-flex;align-items:center;gap:6px;background:#123552;color:#fff;padding:12px 20px;border-radius:999px;font-weight:800;text-decoration:none;margin-top:14px}#aviso-carrito-inicio{margin:13px 0;color:#123552;font-size:14px}';
+    document.head.appendChild(estilo);
+    const enlace=document.createElement('a');enlace.id='carrito-enlace-inicio';enlace.href='/carrito.html';
+    enlace.innerHTML='Ver carrito (<span id="carrito-contador-inicio">0</span>) →';
+    seccion.insertBefore(enlace,contenedor);
+    const aviso=document.createElement('p');aviso.id='aviso-carrito-inicio';
+    aviso.textContent='Puedes añadir cargadores al carrito. El pago online todavía no está habilitado; confirma la compatibilidad antes de comprar.';
+    seccion.insertBefore(aviso,contenedor);
   }
   function tarjeta(pieza) {
     const descripcion=pieza.descripcion ? '<p class="cargador-desc">'+escapeHtml(pieza.descripcion)+'</p>' : '';
@@ -114,6 +134,7 @@
       setTimeout(()=>{if(boton.isConnected)boton.textContent=previo;},1200);
     }
   });
+  prepararInicio();
   actualizarContador();
   fetch(ENDPOINT,{cache:'no-store'})
     .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
