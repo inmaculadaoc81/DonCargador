@@ -20,7 +20,7 @@
 :root{--navy:#123552;--navy2:#0e2b42;--green:#79b45d;--lime:#a7cf77;--ink:#102131;--paper:#fbfcf7;--soft:#eef5e8;--line:#d8e5d1;--wa:#25D366}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}a{text-decoration:none;color:inherit}.wrap{width:min(1180px,92%);margin:auto}
 .top{min-height:78px;background:var(--navy);border-bottom:1px solid #21455f;display:flex;align-items:center;position:sticky;top:0;z-index:100}
-.disclaimer-bar{background:#ffce31;color:var(--ink);text-align:center;font-size:12.5px;font-weight:800;padding:8px 16px}.nav{display:flex;align-items:center;justify-content:space-between;gap:34px}.nav .menu{margin-left:auto}.logo{width:280px;max-height:58px;object-fit:contain;display:block}.menu{display:flex;align-items:center;gap:28px;font-weight:800;font-size:14px;color:#fff;white-space:nowrap}.menu a:hover{color:var(--lime)}.call{background:var(--green);color:#102131;padding:14px 18px;border-radius:999px;font-weight:900}.menu-btn{display:none;border:1px solid #2c5474;background:var(--navy2);color:#fff;border-radius:11px;padding:10px 14px;font-weight:900;font-size:18px;cursor:pointer;margin-left:auto}.mobile-menu{display:none;flex-direction:column;background:var(--navy);border-top:1px solid #21455f;position:absolute;top:100%;left:0;right:0}.mobile-menu:not([hidden]){display:flex}.mobile-menu a{display:block;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-bottom:1px solid #21455f}.mobile-menu a:last-child{border-bottom:none}
+.disclaimer-bar{background:#ffce31;color:var(--ink);text-align:center;font-size:12.5px;font-weight:800;padding:8px 16px}.nav{display:flex;align-items:center;justify-content:space-between;gap:34px}.nav .menu{margin-left:auto}.logo{width:280px;max-height:58px;object-fit:contain;display:block}.menu{display:flex;align-items:center;gap:28px;font-weight:800;font-size:14px;color:#fff;white-space:nowrap}.menu a:hover{color:var(--lime)}.menu .tienda-link{background:var(--green);color:var(--navy);padding:9px 15px;border-radius:999px}.menu .tienda-link:hover{background:var(--lime);color:var(--navy)}.mobile-menu .tienda-link{background:var(--green);color:var(--navy)}.call{background:var(--green);color:#102131;padding:14px 18px;border-radius:999px;font-weight:900}.menu-btn{display:none;border:1px solid #2c5474;background:var(--navy2);color:#fff;border-radius:11px;padding:10px 14px;font-weight:900;font-size:18px;cursor:pointer;margin-left:auto}.mobile-menu{display:none;flex-direction:column;background:var(--navy);border-top:1px solid #21455f;position:absolute;top:100%;left:0;right:0}.mobile-menu:not([hidden]){display:flex}.mobile-menu a{display:block;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-bottom:1px solid #21455f}.mobile-menu a:last-child{border-bottom:none}
 .hero{position:relative;overflow:hidden;padding:70px 0 66px;background:linear-gradient(108deg,#fff 0 62%,#edf6e7 62%)}.hero:before{content:"CARGADOR ORIGINAL";position:absolute;right:-30px;bottom:12px;font-size:72px;font-weight:900;letter-spacing:8px;color:transparent;-webkit-text-stroke:1px rgba(18,53,82,.11);writing-mode:vertical-rl;transform:rotate(180deg);pointer-events:none}.hero:after{content:"";position:absolute;width:420px;height:420px;border:64px dotted rgba(121,180,93,.12);border-radius:50%;right:-135px;top:-110px;pointer-events:none}.hero-lines{position:absolute;right:7%;top:16%;width:180px;height:180px;border:1px dashed rgba(18,53,82,.16);border-radius:44% 56% 61% 39% / 42% 47% 53% 58%;transform:rotate(18deg);pointer-events:none}
 .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:58px;align-items:center;position:relative;z-index:2}.eyebrow{color:#5b963e;font-size:13px;font-weight:900;letter-spacing:2.2px;text-transform:uppercase}.hero h1{font-size:clamp(48px,5.6vw,74px);line-height:1.05;margin:14px 0 22px;max-width:760px;letter-spacing:-1.5px}
 .seo-content .seo-text{max-width:880px}
@@ -46,9 +46,9 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap nav"><img class="logo" src="/assets/logo-don-cargador.jpg" alt="Don Cargador"><nav class="menu"><a href="#cargador">Tu cargador</a><a href="#problemas">Lo que te preocupa</a><a href="#marcas">Marcas</a><a href="#como">Cómo comprar</a><a href="#cita">Pedir cita</a><a href="#guia">Guía</a><a href="#contacto">Contacto</a></nav><button class="menu-btn" onclick="document.getElementById('mobileMenu').hidden=!document.getElementById('mobileMenu').hidden" aria-label="Abrir menú">☰</button></div>
+<header class="top"><div class="wrap nav"><img class="logo" src="/assets/logo-don-cargador.jpg" alt="Don Cargador"><nav class="menu"><a class="tienda-link" href="/catalogo.html">Tienda</a><a href="#cargador">Tu cargador</a><a href="#problemas">Lo que te preocupa</a><a href="#marcas">Marcas</a><a href="#como">Cómo comprar</a><a href="#cita">Pedir cita</a><a href="#guia">Guía</a><a href="#contacto">Contacto</a></nav><button class="menu-btn" onclick="document.getElementById('mobileMenu').hidden=!document.getElementById('mobileMenu').hidden" aria-label="Abrir menú">☰</button></div>
 <div id="mobileMenu" class="mobile-menu" hidden>
-<a href="#cargador">Tu cargador</a><a href="#problemas">Lo que te preocupa</a><a href="#marcas">Marcas</a><a href="#como">Cómo comprar</a><a href="#cita">Pedir cita</a><a href="#guia">Guía</a><a href="#contacto">Contacto</a>
+<a class="tienda-link" href="/catalogo.html">Tienda</a><a href="#cargador">Tu cargador</a><a href="#problemas">Lo que te preocupa</a><a href="#marcas">Marcas</a><a href="#como">Cómo comprar</a><a href="#cita">Pedir cita</a><a href="#guia">Guía</a><a href="#contacto">Contacto</a>
 </div>
 <script>document.querySelectorAll("#mobileMenu a").forEach(function(a){a.addEventListener("click",function(){document.getElementById("mobileMenu").hidden=true;});});</script>
 </header>
@@ -60,16 +60,11 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 <h1>Encuentra el cargador original correcto para tu portátil.</h1>
 <div class="promise">✓ Cargadores originales para portátiles</div>
 <div class="actions">
-<a class="btn wa" href="https://api.whatsapp.com/send?phone=+34649970128&text=%C2%A1Hola%20DonCargador"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3.5A12.4 12.4 0 0 0 5.3 22l-1.6 6.2 6.35-1.66A12.4 12.4 0 1 0 16 3.5Zm0 22.5a10.1 10.1 0 0 1-5.16-1.4l-.37-.22-3.77.99 1.01-3.66-.24-.39A10.1 10.1 0 1 1 16 26Zm5.54-7.55c-.3-.15-1.8-.89-2.08-.99-.28-.1-.49-.15-.69.15-.2.3-.8.99-.98 1.19-.18.2-.36.23-.67.08-.3-.15-1.29-.48-2.46-1.52-.91-.81-1.52-1.82-1.7-2.12-.18-.3-.02-.47.14-.62.14-.14.3-.36.46-.54.16-.18.2-.3.31-.51.1-.2.05-.39-.03-.54-.08-.15-.7-1.68-.96-2.3-.25-.6-.51-.52-.69-.53h-.6c-.2 0-.54.08-.82.39-.28.3-1.08 1.06-1.08 2.59 0 1.52 1.11 2.99 1.26 3.2.15.2 2.18 3.34 5.29 4.69.74.32 1.32.51 1.77.65.74.24 1.41.2 1.95.12.6-.09 1.8-.73 2.05-1.45.25-.71.25-1.32.18-1.45-.08-.13-.29-.2-.59-.35Z"/></svg>WhatsApp | Atención 24 horas 365 días</a>
-<a class="btn blue phone-cta" href="tel:+34914468503"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zm-2.61-.986a1.99 1.99 0 0 1 2.99.183L5.34 2.32a1.98 1.98 0 0 1 .357 1.706l-.549 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.548a1.98 1.98 0 0 1 1.707.357l2.307 1.795a1.99 1.99 0 0 1 .183 2.989l-1.034 1.034c-.812.812-2.014 1.176-3.14.78a19.1 19.1 0 0 1-7.163-4.522 19.1 19.1 0 0 1-4.522-7.163c-.396-1.126-.032-2.328.78-3.14z"/></svg>Atención Telefónica 24 horas 365 días</a>
+<a class="btn wa" href="https://api.whatsapp.com/send?phone=+34649970128&text=%C2%A1Hola%20DonCargador"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3.5A12.4 12.4 0 0 1 5.3 22l-1.6 6.2 6.35-1.66A12.4 12.4 0 1 0 16 3.5Zm0 22.5a10.1 10.1 0 0 1-5.16-1.4l-.37-.22-3.77.99 1.01-3.66-.24-.39A10.1 10.1 0 1 1 16 26Zm5.54-7.55c-.3-.15-1.8-.89-2.08-.99-.28-.1-.49-.15-.69.15-.2.3-.8.99-.98 1.19-.18.2-.36.23-.67.08-.3-.15-1.29-.48-2.46-1.52-.91-.81-1.52-1.82-1.7-2.12-.18-.3-.02-.47.14-.62.14-.14.3-.36.46-.54.16-.18.2-.3.31-.51.1-.2.05-.39-.03-.54-.08-.15-.7-1.68-.96-2.3-.25-.6-.51-.52-.69-.53h-.6c-.2 0-.54.08-.82.39-.28.3-1.08 1.06-1.08 2.59 0 1.52 1.11 2.99 1.26 3.2.15.2 2.18 3.34 5.29 4.69.74.32 1.32.51 1.77.65.74.24 1.41.2 1.95.12.6-.09 1.8-.73 2.05-1.45.25-.71.25-1.32.18-1.45-.08-.13-.29-.2-.59-.35Z"/></svg>WhatsApp 24/7</a>
+<a class="btn blue phone-cta" href="tel:+34914468503"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.19 18.81 19.5 19.5 0 0 1 5.19 12.81 19.79 19.79 0 0 1 2.09 4.18 2 2 0 0 1 4.08 2h3a2 2 0 0 1 2 1.72c.12.96.35 1.9.68 2.79a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.22a2 2 0 0 1 2.11-.45c.89.33 1.83.56 2.79.68A2 2 0 0 1 22 16.92z"/></svg>Atención Telefónica 24 horas</a>
+<a class="btn full" href="#contacto">Solicitar un cargador</a>
 </div></div>
-<aside class="card"><div class="eyebrow">Información de contacto</div><h2>Don Cargador Madrid</h2>
-<div class="row"><small>Dirección</small><b>C. Joaquín María López, 26 · 28015 Madrid</b></div>
-<div class="row"><small>Horario</small><b>Lunes a viernes · 09:30–18:00<br>Sábados, domingos y días festivos estamos cerrados</b></div>
-<div class="row"><small>Teléfono de información</small><b>+34 918 29 46 58</b></div>
-<div class="row"><small>Servicio</small><b>Venta de cargadores originales para portátiles</b></div>
-<div class="ref"><b>Referencia</b><br><b>Metro:</b> Islas Filipinas (L7) · Canal (L2)<br><b>Aparcamiento público:</b> a pocos metros de C. Blasco de Garay, 61</div>
-<a class="maplink" href="https://maps.app.goo.gl/QMZY3SQAJZJt9Mkm6">Ver ubicación y reseñas →</a></aside>
+<aside class="card"><div class="eyebrow">INFORMACIÓN DE CONTACTO</div><h2>Don Cargador Madrid</h2><div class="row"><small>Dirección</small><b>C. Joaquín María López, 26, 28015 Madrid</b></div><div class="row"><small>Horario</small><b>Lunes a viernes: 09:30 – 18:00h</b><br><span>Sábados, domingos y días festivos estamos cerrados</span></div><div class="row"><small>Atención 24 horas</small><b>+34 918 29 46 58</b></div><div class="row"><small>Servicio</small><b>Venta de cargadores originales para portátiles</b></div><div class="ref"><b>Cómo encontrar tu referencia:</b> revisa la etiqueta del cargador original o el modelo exacto del portátil. Si tienes dudas, te ayudamos a identificarlo.</div><a class="maplink" href="https://maps.app.goo.gl/QMZY3SQAJZJt9Mkm6">Ver ubicación y reseñas →</a></aside>
 </div></section>
 
 <section id="problemas"><div class="wrap"><div class="sectiontag">LO QUE REALMENTE TE PREOCUPA</div><h2 class="title">No quieres “un cargador”. Quieres el cargador que corresponde a tu portátil.</h2><p class="intro">Porque equivocarte significa perder tiempo, volver a desplazarte y seguir sin poder usar el equipo. Por eso la referencia importa más que elegir uno que “parece compatible”.</p>
@@ -88,93 +83,14 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 <section id="contacto"><div class="wrap"><div class="sectiontag">¿NO SABES QUÉ CARGADOR NECESITAS?</div><h2 class="title">Envíanos los datos de tu portátil.</h2><p class="intro">No necesitas conocer especificaciones técnicas. Con la marca y el modelo podemos empezar a orientarte.</p><form id="contactForm"><input name="name" placeholder="Nombre" required><input name="email" type="email" placeholder="Correo electrónico" required><input name="phone" placeholder="Teléfono"><input name="subject" placeholder="Marca y modelo del portátil"><textarea name="message" placeholder="Cuéntanos qué cargador necesitas o copia aquí la referencia de tu equipo." required></textarea><label class="full privacy-check"><input type="checkbox" name="privacidad" required> Acepto la <a class="privacy-link" href="https://kelatos.com/privacy-policy/" target="_blank" rel="noopener">política de privacidad</a></label><button class="btn blue full" type="submit">Enviar consulta</button><div class="status" id="status"></div></form>
 <div class="map" style="margin-top:45px"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2890.398083402149!2d-3.7114464!3d40.4377011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd4229546aa6910f%3A0x1e7dc062ed1dd30d!2sDon%20Cargador%20%7C%20Cargadores%20y%20bater%C3%ADas%20Originales%20para%20port%C3%A1tiles%20HP%2C%20Dell%2C%20Asus%2C%20Surface%2C%20Lenovo!5e1!3m2!1ses-419!2ses!4v1787332332224!5m2!1ses-419!2ses" loading="lazy"></iframe></div></div></section>
 
-<section class="seo-content soft" id="guia"><div class="wrap"><div class="sectiontag">Guía</div><h2 class="title">Cómo elegir el cargador correcto para tu portátil</h2>
-<div class="seo-text">
-<p>Un cargador de portátil no se define solo por el conector: el voltaje, el amperaje y la potencia también tienen que coincidir con lo que pide el equipo. Dos cargadores pueden parecer idénticos por fuera y no ser compatibles, y usar uno mal emparejado puede hacer que el portátil cargue mal, se caliente de más o directamente no reconozca el cargador. Por eso, antes de comprar, lo más seguro es partir de la marca y el modelo exacto del equipo.</p>
-<p>En <strong>Don Cargador</strong> trabajamos con cargadores originales para las marcas más habituales: HP, Dell, Asus, Lenovo, MSI y Microsoft Surface. Si conoces el modelo de tu portátil, podemos indicarte directamente la referencia correcta; si no lo sabes, con una foto de la etiqueta del equipo o del cargador antiguo (si lo conservas) normalmente es suficiente para identificarlo.</p>
-<p>Si tu portátil no carga, no siempre es el cargador: el puerto de carga, la batería o la placa también pueden ser la causa. Cuéntanos qué le ocurre al equipo y te orientamos antes de que compres nada, para no gastar en un cargador que no soluciona el problema real.</p>
-</div>
-</div></section>
+<section class="seo-content" id="guia"><div class="wrap"><div class="sectiontag">GUÍA</div><h2 class="title">Cómo identificar el cargador correcto para tu portátil.</h2><div class="seo-text"><p>Antes de comprar, revisa la potencia (W), el voltaje (V), el amperaje (A) y el tipo de conector. Los cargadores USB-C también deben cumplir los requisitos de potencia y protocolos de tu equipo. Si no estás seguro, consulta con nosotros la compatibilidad antes de comprar.</p><p>Trabajamos con distintas referencias para portátiles HP, Dell, ASUS, Lenovo, MSI y Surface, según disponibilidad. La compatibilidad se determina por el modelo exacto y las especificaciones del equipo, no únicamente por la marca.</p></div></div></section>
 </main>
-<footer><div class="wrap footergrid"><div><img class="logo" src="/assets/logo-don-cargador.jpg" alt="Don Cargador"><p>cargadordeportatil.es · Cargadores originales para portátiles en Madrid.</p></div><div><b>Contacto</b><p>+34 918 29 46 58</p></div><div><b>Enlaces</b><p><a href="https://maps.app.goo.gl/QMZY3SQAJZJt9Mkm6">Google Business</a><br><a href="https://www.youtube.com/channel/UCaxAqLD9Mk5gvzqoDedlWSA">YouTube</a></p></div></div></footer>
-<a class="float-wa" aria-label="WhatsApp" href="https://api.whatsapp.com/send?phone=+34649970128&text=%C2%A1Hola%20DonCargador"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3.5A12.4 12.4 0 0 0 5.3 22l-1.6 6.2 6.35-1.66A12.4 12.4 0 1 0 16 3.5Zm0 22.5a10.1 10.1 0 0 1-5.16-1.4l-.37-.22-3.77.99 1.01-3.66-.24-.39A10.1 10.1 0 1 1 16 26Zm5.54-7.55c-.3-.15-1.8-.89-2.08-.99-.28-.1-.49-.15-.69.15-.2.3-.8.99-.98 1.19-.18.2-.36.23-.67.08-.3-.15-1.29-.48-2.46-1.52-.91-.81-1.52-1.82-1.7-2.12-.18-.3-.02-.47.14-.62.14-.14.3-.36.46-.54.16-.18.2-.3.31-.51.1-.2.05-.39-.03-.54-.08-.15-.7-1.68-.96-2.3-.25-.6-.51-.52-.69-.53h-.6c-.2 0-.54.08-.82.39-.28.3-1.08 1.06-1.08 2.59 0 1.52 1.11 2.99 1.26 3.2.15.2 2.18 3.34 5.29 4.69.74.32 1.32.51 1.77.65.74.24 1.41.2 1.95.12.6-.09 1.8-.73 2.05-1.45.25-.71.25-1.32.18-1.45-.08-.13-.29-.2-.59-.35Z"/></svg></a>
+<footer><div class="wrap footergrid"><div><img src="/assets/logo-don-cargador.jpg" alt="Don Cargador" style="width:220px;max-width:100%"><p>Venta de cargadores originales para portátiles.</p></div><div><b>Atención</b><p>Lunes a viernes · 09:30–18:00h</p><p>+34 918 29 46 58</p></div><div><b>Don Cargador</b><p>C. Joaquín María López, 26 · Madrid</p><p><a href="https://maps.app.goo.gl/QMZY3SQAJZJt9Mkm6">Ver ubicación</a></p></div></div></footer>
+<a class="float-wa" href="https://api.whatsapp.com/send?phone=34649970128&text=%C2%A1Hola%20DonCargador" target="_blank" aria-label="WhatsApp"><svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 3.5A12.4 12.4 0 0 0 5.3 22l-1.6 6.2 6.35-1.66A12.4 12.4 0 1 0 16 3.5Zm0 22.5a10.1 10.1 0 0 1-5.16-1.4l-.37-.22-3.77.99 1.01-3.66-.24-.39A10.1 10.1 0 1 1 16 26Zm5.54-7.55c-.3-.15-1.8-.89-2.08-.99-.28-.1-.49.15-.69.15-.2.3-.8.99-.98 1.19-.18.2-.36.23-.67.08-.3-.15-1.29-.48-2.46-1.52-.91-.81-1.52-1.82-1.7-2.12-.18-.3-.02-.47.14-.62.14-.14.3-.36.46-.54.16-.18.2-.3.31-.51.1-.2.05-.39-.03-.54-.08-.15-.7-1.68-.96-2.3-.25-.6-.51-.52-.69-.53h-.6c-.2 0-.54.08-.82.39-.28.3-1.08 1.06-1.08 2.59 0 1.52 1.11 2.99 1.26 3.2.15.2 2.18 3.34 5.29 4.69.74.32 1.32.51 1.77.65.74.24 1.41.2 1.95.12.6-.09 1.8-.73 2.05-1.45.25-.71.25-1.32.18-1.45-.08-.13-.29-.2-.59-.35Z"/></svg></a>
 <div id="n8n-chat"></div>
 <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet">
-<script type="module">import {createChat} from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';createChat({webhookUrl:'https://sswebhookss.affirmatechnology.com/webhook/be1293ae-db62-4ab3-8204-d2ae42505d63/chat',target:'#n8n-chat',mode:'window',defaultLanguage:'es',initialMessages:['¡Hola! 👋 Soy Fátima. Dime qué portátil tienes y te ayudamos a identificar el cargador.'],i18n:{es:{title:'Don Cargador',subtitle:'Asistente virtual',footer:'',getStarted:'INICIAR CONVERSACIÓN',inputPlaceholder:'Escribe tu mensaje...'}}});</script>
-<script>document.getElementById('contactForm').addEventListener('submit',async e=>{e.preventDefault();const s=document.getElementById('status');s.textContent='Enviando…';try{const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});const j=await r.json();if(!r.ok)throw new Error(j.error||'No se pudo enviar');s.textContent='Consulta enviada correctamente.';e.target.reset()}catch(err){s.textContent='No se pudo enviar el formulario. Inténtalo de nuevo o contacta por teléfono.'}});</script>
+<script type="module">import{createChat}from'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';createChat({webhookUrl:'https://sswebhookss.affirmatechnology.com/webhook/be1293ae-db62-4ab3-8204-d2ae42505d63/chat',target:'#n8n-chat',mode:'window',defaultLanguage:'es',initialMessages:['¡Hola! 👋 Soy Fátima. Cuéntame qué cargador necesitas y para qué portátil.'],i18n:{es:{title:'Don Cargador',subtitle:'Asistente virtual',footer:'',getStarted:'INICIAR CONVERSACIÓN',inputPlaceholder:'Escribe tu mensaje...'}}});</script>
 <script src="/assets/cargadores.js"></script>
-
-<style>
-/* Chatbot: botón flotante siempre visible arriba del WhatsApp, y ventana del chat siempre por encima del botón (nunca detrás) */
-#n8n-chat{position:relative;z-index:10070!important;}
-#n8n-chat .chat-window-toggle,
-#n8n-chat button.chat-window-toggle,
-#n8n-chat button[class*="chat-window-toggle"],
-#n8n-chat [class*="chat-window-toggle"]{
-  position:fixed!important;
-  right:22px!important;
-  bottom:96px!important;
-  width:58px!important;
-  height:58px!important;
-  border-radius:50%!important;
-  background:#123552!important;
-  color:#fff!important;
-  z-index:10060!important;
-  box-shadow:0 10px 28px rgba(0,0,0,.18)!important;
-  transform:none!important;
-}
-#n8n-chat .chat-window,
-#n8n-chat [class*="chat-window"]:not(.chat-window-toggle){
-  position:fixed!important;
-  right:22px!important;
-  bottom:166px!important;
-  z-index:10100!important;
-  max-height:calc(100vh - 190px)!important;
-}
-.float-wa{right:22px!important;bottom:22px!important;z-index:10050!important;}
-@media(max-width:600px){
-  #n8n-chat .chat-window-toggle,
-  #n8n-chat button.chat-window-toggle,
-  #n8n-chat button[class*="chat-window-toggle"],
-  #n8n-chat [class*="chat-window-toggle"]{right:16px!important;bottom:90px!important;}
-  #n8n-chat .chat-window,
-  #n8n-chat [class*="chat-window"]:not(.chat-window-toggle){
-    left:12px!important;
-    right:12px!important;
-    bottom:160px!important;
-    width:auto!important;
-    max-width:none!important;
-    max-height:calc(100vh - 180px)!important;
-  }
-  .float-wa{right:16px!important;bottom:18px!important;}
-}
-</style>
-<script>
-(function(){
-  const fix=()=>{
-    const mobile=window.innerWidth<=600;
-    const toggle=document.querySelector('#n8n-chat .chat-window-toggle, #n8n-chat [class*="chat-window-toggle"]');
-    if(toggle){
-      toggle.style.setProperty('position','fixed','important');
-      toggle.style.setProperty('right', mobile?'16px':'22px','important');
-      toggle.style.setProperty('bottom', mobile?'90px':'96px','important');
-      toggle.style.setProperty('z-index','10060','important');
-    }
-    document.querySelectorAll('#n8n-chat .chat-window, #n8n-chat [class*="chat-window"]').forEach(el=>{
-      if(el.classList.contains('chat-window-toggle')) return;
-      el.style.setProperty('position','fixed','important');
-      el.style.setProperty('right', mobile?'12px':'22px','important');
-      el.style.setProperty('bottom', mobile?'160px':'166px','important');
-      el.style.setProperty('z-index','10100','important');
-      el.style.setProperty('max-height', mobile?'calc(100vh - 180px)':'calc(100vh - 190px)','important');
-    });
-  };
-  const obs=new MutationObserver(fix);
-  obs.observe(document.documentElement,{childList:true,subtree:true,attributes:true});
-  setTimeout(fix,300);setTimeout(fix,1000);setTimeout(fix,2000);
-  window.addEventListener('resize',fix);
-})();
-</script>
 <div id="cookie-banner" class="cookie-banner" hidden>
   <p>Utilizamos cookies y tecnologías similares propias y de terceros, de sesión o persistentes, para hacer funcionar de manera segura nuestra página web y personalizar su contenido. Igualmente, utilizamos cookies para medir y obtener datos de la navegación que realizas y para ajustar la publicidad a tus gustos y preferencias. Puedes aceptar el uso de cookies a continuación.</p>
   <div class="cookie-actions">
@@ -191,7 +107,7 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 .cookie-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;flex:0 0 auto}
 .cookie-btn{display:inline-block;border:0;background:#1fb6ad;color:#fff!important;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:6px;cursor:pointer;text-decoration:none;white-space:nowrap}
 .cookie-btn:hover{background:#189d95}
-.cookie-close{position:absolute;top:10px;right:14px;background:transparent;border:0;color:#aab0bb;font-size:22px;line-height:1;cursor:pointer;padding:6px 8px}
+.cookie-close{position:absolute;top:10px;right:14px;background:transparent;border:0;color:#aab0bb;font-size:22px;padding:6px 8px}
 .cookie-close:hover{color:#fff}
 @media(max-width:700px){
   .cookie-banner{padding:18px 40px 18px 16px;text-align:left}
@@ -206,16 +122,14 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
   var banner=document.getElementById('cookie-banner');
   if(!banner) return;
   var already=false;
-  try{ already=!!localStorage.getItem(KEY); }catch(e){}
-  if(already){ banner.hidden=true; return; }
+  try{already=!!localStorage.getItem(KEY)}catch(e){}
+  if(already){banner.hidden=true;return}
   banner.hidden=false;
-  function setConsent(value){
-    try{ localStorage.setItem(KEY,value); }catch(e){}
-    banner.hidden=true;
-  }
-  var a=document.getElementById('cookie-accept'); if(a) a.addEventListener('click',function(){setConsent('accepted')});
-  var r=document.getElementById('cookie-reject'); if(r) r.addEventListener('click',function(){setConsent('rejected')});
-  var c=document.getElementById('cookie-close'); if(c) c.addEventListener('click',function(){setConsent('dismissed')});
+  function setConsent(value){try{localStorage.setItem(KEY,value)}catch(e){}banner.hidden=true}
+  var a=document.getElementById('cookie-accept');if(a)a.addEventListener('click',function(){setConsent('accepted')});
+  var r=document.getElementById('cookie-reject');if(r)r.addEventListener('click',function(){setConsent('rejected')});
+  var c=document.getElementById('cookie-close');if(c)c.addEventListener('click',function(){setConsent('dismissed')});
 })();
 </script>
-</body></html>
+</body>
+</html>
