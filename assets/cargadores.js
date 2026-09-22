@@ -39,9 +39,16 @@
     return pieza.stock_disponible !== null && pieza.stock_disponible !== undefined && Number.isSafeInteger(n) && n >= 0 ? n : null;
   }
   function imagenDe(pieza) {
-    if (!pieza.imagen_url) return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
+    const imagenes = {
+      ACER:'cargador-acer.webp', ASUS:'cargador-asus.webp', DELL:'cargador-dell.webp',
+      HP:'cargador-hp.webp', LENOVO:'cargador-lenovo.webp',
+      MICROSOFT:'cargador-surface.webp', SURFACE:'cargador-surface.webp'
+    };
+    const imagenMarca = imagenes[normalizar(marcaDe(pieza))];
+    const ruta = pieza.imagen_url || (imagenMarca ? '/assets/images/'+imagenMarca : '');
+    if (!ruta) return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
     try {
-      const url = new URL(String(pieza.imagen_url),window.location.href);
+      const url = new URL(String(ruta),window.location.href);
       if (url.protocol !== 'https:') throw new Error('URL no segura');
       return '<img class="cargador-imagen" src="'+escapeHtml(url.href)+'" alt="'+escapeHtml(pieza.nombre)+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="cargador-imagen-placeholder" hidden aria-hidden="true">DC</span>';
     } catch { return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>'; }
