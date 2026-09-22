@@ -1,14 +1,19 @@
 (function () {
-  // Catálogo público. El navegador no decide precio final ni confirma pagos.
-  // La página principal no carga compra-config.js; usar el mismo endpoint HTTPS público.
+  // Catálogo público: los enlaces Getnet se asignan por referencia exacta, nunca por coincidencia de nombres.
   const config = window.DONCARGADOR_COMPRA || {apiOrigen:'https://db.affirmatechnology.com/kelatos-api',pagosHabilitados:false};
   const ENDPOINT = config.apiOrigen + '/publico/piezas-cargador';
-  const CLAVE_CARRITO = 'doncargador_carrito_v1';
+  const ENLACES_GETNET = Object.freeze({
+    '666':'NDk4OzEw','22':'NDk4OzEx','23':'NDk4OzEy','24':'NDk4OzEz',
+    '4578':'NDk4OzE0','456':'NDk4OzE1','9':'NDk4OzE2','10':'NDk4OzE3',
+    '7':'NDk4OzE4','8':'NDk4OzE5','19':'NDk4OzIw','20':'NDk4OzIx',
+    '21':'NDk4OzIy','12':'NDk4OzIz','15':'NDk4OzI0','13':'NDk4OzI1',
+    '14':'NDk4OzI2','16':'NDk4OzI3','17':'NDk4OzI4','18':'NDk4OzI5',
+    '4':'NDk4OzMw','5':'NDk4OzMx','77':'NDk4OzMy','3':'NDk4OzMz',
+    '2':'NDk4OzM0','1':'NDk4OzM1','11':'NDk4OzM2','555':'NDk4OzM3','6':'NDk4OzM4'
+  });
   const contenedor = document.getElementById('cargadores-lista');
   if (!contenedor) return;
   const esInicio = !document.getElementById('cargadores-busqueda');
-  let piezasPorReferencia = new Map();
-
   function escapeHtml(valor) {
     return String(valor == null ? '' : valor).replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -55,13 +60,9 @@
   }
   function obtenerCarrito() {
     try {
-      const datos=JSON.parse(localStorage.getItem(CLAVE_CARRITO)||'[]');
+      const datos=JSON.parse(localStorage.getItem('doncargador_carrito_v1')||'[]');
       return Array.isArray(datos) ? datos.filter(x=>x && typeof x.referencia==='string' && Number.isSafeInteger(x.cantidad) && x.cantidad>0 && x.cantidad<=20).slice(0,20) : [];
     } catch { return []; }
-  }
-  function guardarCarrito(carrito) {
-    try { localStorage.setItem(CLAVE_CARRITO,JSON.stringify(carrito)); return true; }
-    catch { alert('No se pudo guardar el carrito en este navegador.'); return false; }
   }
   function actualizarContador() {
     const total=obtenerCarrito().reduce((n,x)=>n+x.cantidad,0);
@@ -75,28 +76,29 @@
     const seccion=document.getElementById('stock-disponible-ahora') || contenedor.parentElement;
     if (!seccion || document.getElementById('carrito-enlace-inicio')) return;
     const estilo=document.createElement('style');
-    estilo.textContent='#stock-disponible-ahora .cargador-body{display:flex;flex-direction:column;flex:1}#stock-disponible-ahora .cargador-card{display:flex;flex-direction:column}#stock-disponible-ahora .cargador-precio{margin-top:auto}#stock-disponible-ahora .cargador-stock{margin:8px 0;color:#286c32;font-weight:700}#stock-disponible-ahora .cargador-anadir{background:#123552;color:white;padding:12px 16px;border-radius:25px;font-weight:800;margin-top:9px}#stock-disponible-ahora .cargador-no-disponible{display:block;margin-top:8px}#carrito-enlace-inicio{display:inline-flex;align-items:center;gap:6px;background:#123552;color:#fff;padding:12px 20px;border-radius:999px;font-weight:800;text-decoration:none;margin-top:14px}#aviso-carrito-inicio{margin:13px 0;color:#123552;font-size:14px}';
+    estilo.textContent='#stock-disponible-ahora .cargador-body{display:flex;flex-direction:column;flex:1}#stock-disponible-ahora .cargador-card{display:flex;flex-direction:column}#stock-disponible-ahora .cargador-precio{margin-top:auto}#stock-disponible-ahora .cargador-stock{margin:8px 0;color:#286c32;font-weight:700}#stock-disponible-ahora .cargador-anadir{display:block;text-align:center;text-decoration:none;background:#123552;color:white;padding:12px 16px;border-radius:25px;font-weight:800;margin-top:9px}#stock-disponible-ahora .cargador-no-disponible{display:block;margin-top:8px}#carrito-enlace-inicio{display:inline-flex;align-items:center;gap:6px;background:#123552;color:#fff;padding:12px 20px;border-radius:999px;font-weight:800;text-decoration:none;margin-top:14px}#aviso-carrito-inicio{margin:13px 0;color:#123552;font-size:14px}';
     document.head.appendChild(estilo);
     const enlace=document.createElement('a');enlace.id='carrito-enlace-inicio';enlace.href='/carrito.html';
     enlace.innerHTML='Ver carrito (<span id="carrito-contador-inicio">0</span>) →';
     seccion.insertBefore(enlace,contenedor);
     const aviso=document.createElement('p');aviso.id='aviso-carrito-inicio';
-    aviso.textContent='Puedes añadir cargadores al carrito. El pago online todavía no está habilitado; confirma la compatibilidad antes de comprar.';
+    aviso.textContent='Selecciona un cargador para consultar su ficha en Getnet. Comprueba la compatibilidad antes de comprar.';
     seccion.insertBefore(aviso,contenedor);
   }
   function tarjeta(pieza) {
     const descripcion=pieza.descripcion ? '<p class="cargador-desc">'+escapeHtml(pieza.descripcion)+'</p>' : '';
     const stock=unidades(pieza);
-    const comprable=typeof pieza.referencia==='string' && pieza.referencia.length>0 && Number(pieza.precio)>0 && stock !== null && stock>0;
+    const referencia=String(pieza.referencia == null ? '' : pieza.referencia).trim();
+    const codigo=Object.prototype.hasOwnProperty.call(ENLACES_GETNET,referencia) ? ENLACES_GETNET[referencia] : null;
+    const disponible=Boolean(codigo) && Number(pieza.precio)>0 && stock !== null && stock>0;
     const stockTexto=stock === null ? 'Stock pendiente de confirmar' : 'Stock: '+stock+' '+(stock===1?'unidad':'unidades');
-    const boton=comprable ? '<button type="button" class="cargador-anadir" data-referencia="'+escapeHtml(pieza.referencia)+'">Añadir al carrito</button>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
+    const boton=disponible ? '<a class="cargador-anadir" href="https://sis.redsys.es/tiendaWeb/item/'+codigo+'" target="_blank" rel="noopener noreferrer" aria-label="Ver en Getnet: '+escapeHtml(pieza.nombre||'Cargador')+'">Ver producto</a>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
     return '<article class="cargador-card">'+imagenDe(pieza)+
       '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(pieza))+'</div>'+
       '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+descripcion+
       '<div class="cargador-precio">'+euros(pieza.precio)+'</div><p class="cargador-stock">'+stockTexto+'</p>'+boton+'</div></article>';
   }
   function mostrar(piezas) {
-    piezasPorReferencia=new Map(piezas.filter(p=>typeof p.referencia==='string').map(p=>[p.referencia,p]));
     const filtros=document.getElementById('cargadores-filtros');
     const busqueda=document.getElementById('cargadores-busqueda');
     const marcas=Array.from(new Set(piezas.map(marcaDe))).sort((a,b)=>a.localeCompare(b,'es'));
@@ -118,29 +120,6 @@
     if (busqueda) busqueda.addEventListener('input',actualizar);
     actualizar();
   }
-  contenedor.addEventListener('click',evento=>{
-    const boton=evento.target.closest('button[data-referencia]');
-    if (!boton||!contenedor.contains(boton)) return;
-    const referencia=boton.dataset.referencia;
-    const pieza=piezasPorReferencia.get(referencia);
-    if (!pieza) return;
-    const stock=unidades(pieza);
-    if (stock === null || stock<1) {alert('No se ha podido confirmar el stock de este cargador.');return;}
-    const carrito=obtenerCarrito();
-    let linea=carrito.find(x=>x.referencia===referencia);
-    if (linea) {
-      if (linea.cantidad>=Math.min(20,stock)) {alert('Solo hay '+stock+' unidades disponibles para esta referencia.');return;}
-      linea.cantidad++;
-    } else {
-      if (carrito.length>=20) {alert('Máximo 20 referencias por pedido.');return;}
-      carrito.push({referencia,cantidad:1});
-    }
-    if (guardarCarrito(carrito)) {
-      actualizarContador();
-      const previo=boton.textContent;boton.textContent='Añadido al carrito';
-      setTimeout(()=>{if(boton.isConnected)boton.textContent=previo;},1200);
-    }
-  });
   prepararInicio();
   actualizarContador();
   fetch(ENDPOINT,{cache:'no-store'})
