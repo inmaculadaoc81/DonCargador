@@ -1,5 +1,5 @@
 (function () {
-  // Catálogo público: los enlaces Getnet se asignan por referencia exacta, nunca por coincidencia de nombres.
+  // Catálogo público: los enlaces Getnet se asignan por referencia exacta.
   const config = window.DONCARGADOR_COMPRA || {apiOrigen:'https://db.affirmatechnology.com/kelatos-api',pagosHabilitados:false};
   const ENDPOINT = config.apiOrigen + '/publico/piezas-cargador';
   const ENLACES_GETNET = Object.freeze({
@@ -37,11 +37,14 @@
   }
   function euros(precio) {
     if (precio == null || precio === '' || !Number.isFinite(Number(precio)) || Number(precio) <= 0) return 'Consultar precio';
-    return Number(precio).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' € IVA inc.';
+    return Number(precio).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
   }
   function unidades(pieza) {
-    const n=Number(pieza.stock_disponible);
-    return pieza.stock_disponible !== null && pieza.stock_disponible !== undefined && Number.isSafeInteger(n) && n >= 0 ? n : null;
+    // La API pública puede entregar el inventario como «stock» o «stock_disponible».
+    const valor = pieza.stock_disponible != null && pieza.stock_disponible !== '' ? pieza.stock_disponible : pieza.stock;
+    if (valor == null || valor === '') return null;
+    const n = Number(valor);
+    return Number.isSafeInteger(n) && n >= 0 ? n : null;
   }
   function imagenDe(pieza) {
     const imagenes = {
@@ -86,16 +89,16 @@
     seccion.insertBefore(aviso,contenedor);
   }
   function tarjeta(pieza) {
-    const descripcion=pieza.descripcion ? '<p class="cargador-desc">'+escapeHtml(pieza.descripcion)+'</p>' : '';
     const stock=unidades(pieza);
     const referencia=String(pieza.referencia == null ? '' : pieza.referencia).trim();
     const codigo=Object.prototype.hasOwnProperty.call(ENLACES_GETNET,referencia) ? ENLACES_GETNET[referencia] : null;
     const disponible=Boolean(codigo) && Number(pieza.precio)>0 && stock !== null && stock>0;
-    const stockTexto=stock === null ? 'Stock pendiente de confirmar' : 'Stock: '+stock+' '+(stock===1?'unidad':'unidades');
+    const stockTexto=stock === null ? 'Stock pendiente de confirmar' : stock === 0 ? 'Sin existencias' : 'Stock: '+stock+' '+(stock===1?'unidad':'unidades');
     const boton=disponible ? '<a class="cargador-anadir" href="https://sis.redsys.es/tiendaWeb/item/'+codigo+'" target="_blank" rel="noopener noreferrer" aria-label="Ver en Getnet: '+escapeHtml(pieza.nombre||'Cargador')+'">Ver producto</a>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
     return '<article class="cargador-card">'+imagenDe(pieza)+
       '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(pieza))+'</div>'+
-      '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+descripcion+
+      '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+
+      '<p class="cargador-desc">Precio incluye IVA.</p>'+
       '<div class="cargador-precio">'+euros(pieza.precio)+'</div><p class="cargador-stock">'+stockTexto+'</p>'+boton+'</div></article>';
   }
   function mostrar(piezas) {
