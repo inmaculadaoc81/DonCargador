@@ -187,6 +187,22 @@ width:100%;height:100% para rellenar ese wrapper ya correctamente
 posicionado y limitado, en vez de competir con position:fixed propio.
 Aplicado en catalogo.html e index.html.
 
+SOLICITUD DEL CLIENTE — botón "Solicita recogida" en el menú:
+- Añadido un nuevo botón "Solicita recogida" en el hueco vacío junto
+  a "Tienda" en la cabecera (captura del cliente), en index.html y
+  catalogo.html, tanto en el menú de escritorio como en el menú móvil.
+  Enlaza a https://sis.redsys.es/tiendaWeb/item/NDk4OzM5, se abre en
+  pestaña nueva. Estilo: píldora con borde blanco (distinta de la
+  píldora verde sólida de "Tienda" para no confundirse visualmente al
+  estar una al lado de la otra).
+- Reemplazado el enlace de Redsys en el botón existente del hero
+  "Solicita el envío de tu cargador ahora" (index.html): antes
+  apuntaba a .../item/NDk4OzQ=, ahora a .../item/NDk4OzM5 (mismo
+  enlace nuevo). Verificado que no queda ningún .../item/NDk4OzQ= en
+  el repositorio. No se ha tocado el enlace "Comprar" de
+  assets/cargadores.js (usa un código de producto distinto por cada
+  cargador del catálogo, no es el enlace de envío/recogida genérico).
+
 - A VALORAR (no modificado, es una decisión de negocio, no un bug de
   código): catalogo.html tiene <meta name="robots"
   content="noindex,nofollow"> y no aparece en sitemap.xml, igual que
