@@ -217,6 +217,26 @@ AJUSTES DEL CLIENTE sobre los botones (misma sesión):
   para la Península", a petición del cliente (el envío no cubre
   Canarias/Baleares/Ceuta/Melilla).
 
+BUG REAL — a petición del cliente ("los botones no funcionan"):
+- El cliente señaló que https://cargadordeportatil.es/#cargador no
+  llevaba a ningún sitio útil. Causa raíz encontrada: .top (la
+  cabecera) es position:sticky;top:0 en index.html, pero no había
+  ningún scroll-padding-top definido en <html>. Al pulsar cualquier
+  enlace de ancla (#marcas, #cita, #guia, #contacto — y el logo,
+  #cargador), el navegador saltaba a la sección, pero el título de esa
+  sección quedaba tapado detrás de la cabecera fija (78px de alto),
+  dando la sensación de que "no pasaba nada" al pulsar el botón.
+  Corregido añadiendo html{scroll-padding-top:96px} en index.html, que
+  cubre TODOS los enlaces de ancla del sitio (no solo el del logo).
+- Además, el enlace del logo (aria-label="Ir al inicio") se ha
+  cambiado de href="#cargador" (index.html) / href="/#cargador"
+  (catalogo.html) a href="/" — un destino real y absoluto, sin
+  depender de saltos de ancla, que siempre funciona desde cualquier
+  página y cualquier posición de scroll.
+- Revisado el resto de enlaces del menú y de los botones (índice,
+  tienda, carrito, pago-ok, pago-ko): todos usan URLs reales o anclas
+  con id correspondiente; no se ha encontrado ningún otro enlace roto.
+
 - A VALORAR (no modificado, es una decisión de negocio, no un bug de
   código): catalogo.html tiene <meta name="robots"
   content="noindex,nofollow"> y no aparece en sitemap.xml, igual que
