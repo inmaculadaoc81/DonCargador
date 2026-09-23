@@ -49,11 +49,13 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 /* Ajustes hero 23-09: tarjeta en su columna y CTAs más redondeados */
 .hero-actions .hero-btn{border-radius:999px;padding:12px 22px;min-height:68px}
 .hero-actions .hero-btn-icon{border-radius:50%;width:42px;height:42px;min-width:42px}
-.hero-actions .hero-wa .hero-btn-icon{background:#fff;color:var(--wa);box-shadow:0 0 0 3px rgba(255,255,255,.18)}
-.hero-actions .hero-wa .hero-btn-icon svg{width:27px;height:27px}
+.hero-actions .hero-wa .hero-btn-icon{background:#fff;color:var(--wa);box-shadow:0 0 0 3px rgba(255,255,255,.18);padding:5px}
+.hero-actions .hero-wa .hero-btn-icon svg{width:30px;height:30px;display:block}
 .hero-actions .hero-send .hero-btn-icon{background:rgba(255,255,255,.16)}
 .hero-actions .hero-store .hero-btn-icon{background:var(--soft);color:var(--navy)}
 @media(max-width:600px){.hero-actions .hero-btn{border-radius:24px;padding:12px 16px}}
+
+.brand-seo{padding:76px 0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.brand-seo .seo-text{max-width:960px}.brand-seo .seo-text p{color:#506375}.brand-seo-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.brand-seo-links .btn{border-radius:999px}
 </style>
 </head>
 <body>
@@ -72,7 +74,7 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 
 <div class="actions hero-actions">
 <a class="btn hero-btn wa hero-wa" href="https://api.whatsapp.com/send?phone=34649970128&text=%C2%A1Hola%20DonCargador" target="_blank" rel="noopener" aria-label="WhatsApp Atención 24 horas 365 días +34 649 97 01 28">
-  <span class="hero-btn-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 3.5A12.4 12.4 0 0 1 5.3 22l-1.6 6.2 6.35-1.66A12.4 12.4 0 1 0 16 3.5Zm0 22.5a10.1 10.1 0 0 1-5.16-1.4l-.37-.22-3.77.99 1.01-3.66-.24-.39A10.1 10.1 0 1 1 16 26Zm5.54-7.55c-.3-.15-1.8-.89-2.08-.99-.28-.1-.49-.15-.69.15-.2.3-.8.99-.98 1.19-.18.2-.36.23-.67.08-.3-.15-1.29-.48-2.46-1.52-.91-.81-1.52-1.82-1.7-2.12-.18-.3-.02-.47.14-.62.14-.14.3-.36.46-.54.16-.18.2-.3.31-.51.1-.2.05-.39-.03-.54-.08-.15-.7-1.68-.96-2.3-.25-.6-.51-.52-.69-.53h-.6c-.2 0-.54.08-.82.39-.28.3-1.08 1.06-1.08 2.59 0 1.52 1.11 2.99 1.26 3.2.15.2 2.18 3.34 5.29 4.69.74.32 1.32.51 1.77.65.74.24 1.41.2 1.95.12.6-.09 1.8-.73 2.05-1.45.25-.71.25-1.32.18-1.45-.08-.13-.29-.2-.59-.35Z"/></svg></span>
+  <span class="hero-btn-icon" aria-hidden="true"><svg viewBox="0 0 32 32" role="img"><circle cx="16" cy="16" r="15" fill="currentColor"/><path fill="#fff" d="M23.1 8.8A9.9 9.9 0 0 0 7.5 20.7L6.1 26l5.4-1.4a9.9 9.9 0 0 0 4.7 1.2h.1a9.9 9.9 0 0 0 6.8-17Zm-6.8 15.3a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.2.8.9-3.1-.2-.3a8.2 8.2 0 1 1 7 3.9Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.8-.2-.3.2-.3.6-1.1.1-.2.1-.4 0-.5l-.8-2c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1 0 1.3.9 2.5 1 2.6.1.2 1.8 2.8 4.5 3.9 1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg></span>
   <span class="hero-btn-copy"><strong>WhatsApp</strong><small>Atención 24 horas · 365 días · +34 649 97 01 28</small></span>
 </a>
 <a class="btn hero-btn hero-send" href="https://sis.redsys.es/tiendaWeb/item/NDk4OzQ=" target="_blank" rel="noopener">
@@ -143,6 +145,7 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 </script>
 <div class="map" style="margin-top:45px"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2890.398083402149!2d-3.7114464!3d40.4377011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd4229546aa6910f%3A0x1e7dc062ed1dd30d!2sDon%20Cargador%20%7C%20Cargadores%20y%20bater%C3%ADas%20Originales%20para%20port%C3%A1tiles%20HP%2C%20Dell%2C%20Asus%2C%20Surface%2C%20Lenovo!5e1!3m2!1ses-419!2ses!4v1787332332224!5m2!1ses-419!2ses" loading="lazy"></iframe></div></div></section>
 
+<section class="brand-seo" aria-labelledby="don-cargador-marca"><div class="wrap"><div class="sectiontag">DON CARGADOR</div><h2 class="title" id="don-cargador-marca">Don Cargador: especialistas en cargadores para portátiles.</h2><div class="seo-text"><p><strong>Don Cargador</strong> es una tienda especializada en cargadores para ordenadores portátiles. Nuestro catálogo reúne cargadores para portátiles Acer, ASUS, Dell, HP, Lenovo, MSI y Microsoft Surface, con distintas potencias y tipos de conector según la referencia disponible.</p><p>En <strong>cargadordeportatil.es</strong> puedes consultar el stock disponible y buscar por marca, potencia o conector. Si no sabes qué cargador necesita tu portátil, puedes indicarnos la marca y el modelo del equipo para ayudarte a identificar una referencia compatible antes de realizar la compra.</p><p>Don Cargador ofrece compra online y atención desde Madrid, con opción de recogida y envío. Antes de elegir un cargador recomendamos comprobar el voltaje, amperaje, potencia y conector del equipo para evitar incompatibilidades.</p></div><div class="brand-seo-links"><a class="btn blue" href="/catalogo.html">Ver cargadores disponibles</a><a class="btn outline" href="#cita">Consultar compatibilidad</a></div></div></section>
 <section class="seo-content" id="guia"><div class="wrap"><div class="sectiontag">GUÍA</div><h2 class="title">Cómo identificar el cargador correcto para tu portátil.</h2><div class="seo-text"><p>Antes de comprar, revisa la potencia (W), el voltaje (V), el amperaje (A) y el tipo de conector. Los cargadores USB-C también deben cumplir los requisitos de potencia y protocolos de tu equipo. Si no estás seguro, consulta con nosotros la compatibilidad antes de comprar.</p><p>Trabajamos con distintas referencias para portátiles HP, Dell, ASUS, Lenovo, MSI y Surface, según disponibilidad. La compatibilidad se determina por el modelo exacto y las especificaciones del equipo, no únicamente por la marca.</p></div></div></section>
 </main>
 <footer><div class="wrap footergrid"><div><img src="/assets/logo-don-cargador.jpg" alt="Don Cargador" style="width:220px;max-width:100%"><p>Venta de cargadores originales para portátiles.</p></div><div><b>Atención</b><p>Lunes a viernes · 09:30–18:00h</p><p>+34 918 29 46 58</p></div><div><b>Don Cargador</b><p>C. Joaquín María López, 26 · Madrid</p><p><a href="https://maps.app.goo.gl/QMZY3SQAJZJt9Mkm6">Ver ubicación</a></p></div></div></footer>
