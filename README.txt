@@ -121,3 +121,64 @@ REVISIÓN ADICIONAL (checklist unificado de la familia, a petición del cliente 
   color sólido) al pasar el ratón.
 - Verificado: este repo no usa el patrón de franja de insignias bajo
   el H1 (familia Dyson); no aplica la reubicación.
+
+AUDITORÍA — ventana del chatbot rota en la tienda (catalogo.html), a
+petición del cliente (captura de móvil: la ventana abierta del chat
+tapaba la cabecera y ocupaba casi todo el ancho de la pantalla):
+
+- BUG REAL — causa raíz: en la librería @n8n/chat, el elemento con
+  position:fixed real es .chat-window-wrapper (el contenedor padre),
+  NO .chat-window. El wrapper se posiciona y se limita en tamaño
+  mediante las variables CSS --chat--window--right,
+  --chat--window--bottom y --chat--window--z-index (confirmado
+  descargando y leyendo el style.css real del CDN). El código anterior
+  nunca definía esas variables — solo definía
+  --chat--toggle--position-right/bottom (que son variables distintas,
+  solo para el botón flotante) — así que el wrapper cae al valor por
+  defecto de la librería (1rem de margen), quedando con
+  max-width/max-height de casi el 100% del viewport. Al mismo tiempo,
+  el código forzaba position:fixed!important directamente sobre
+  .chat-window (el hijo), compitiendo con el propio modelo de layout
+  flex del wrapper en vez de usarlo. Resultado: en móvil la ventana se
+  renderizaba con el tamaño casi completo del wrapper (pantalla
+  completa) en lugar del recuadro 400×560/ajustado a móvil previsto.
+- Corregido en catalogo.html e index.html (index.html tenía el mismo
+  fallo, aunque el cliente solo lo detectó en la tienda — corregido
+  también de forma preventiva): se añadieron --chat--window--right,
+  --chat--window--bottom y --chat--window--z-index al bloque
+  #n8n-chat (base y dentro de @media max-width:600px), y se eliminó
+  el position:fixed!important / top:auto!important / transform:none
+  !important redundante sobre .chat-window, dejando solo width/height
+  !important como límite de seguridad. Ahora el tamaño y la posición
+  los gobierna el wrapper real de la librería, tal como está
+  diseñado, en vez de pelear con él.
+- Confirmado con curl que el catalogo.html en producción
+  (cargadordeportatil.es/catalogo) era exactamente el mismo código
+  revisado aquí (hash idéntico salvo saltos de línea).
+- BUG REAL — CSS huérfana: la regla .phone-cta seguía en index.html
+  pero ningún elemento del HTML actual usa esa clase (el botón de
+  llamada del hero fue sustituido hace tiempo por los 3 botones
+  actuales: WhatsApp / Solicita el envío / Nuestra tienda). Eliminada.
+- Verificado sin bugs: enlaces internos (#cargador, #cita, #contacto,
+  #guia, #marcas) resuelven todos a su id; formulario de contacto
+  (name/email/phone/subject/message) coincide exactamente con lo que
+  espera api/contact.js; JSON-LD válido y consistente (teléfono
+  +34 918 29 46 58, dirección C. Joaquín María López 26, mismo
+  place_id de Google Maps que el enlace); package.json y vercel.json
+  correctos; sin archivos JS/CSS huérfanos en assets/api/backend/lib
+  (los 4 scripts de assets/ se usan cada uno en su página); sin
+  ninguna referencia cruzada a otras marcas de la familia
+  (SmartSheets/FlujoPro/DataLabs/PowerFlow/CrmActiva/ThermomixTech);
+  robots.txt y sitemap.xml apuntan al dominio correcto; los 12
+  archivos JS del repo (assets/api/lib/backend) pasan
+  "node --check" sin errores.
+- A VALORAR (no modificado, es una decisión de negocio, no un bug de
+  código): catalogo.html tiene <meta name="robots"
+  content="noindex,nofollow"> y no aparece en sitemap.xml, igual que
+  carrito.html/pago-ok.html/pago-ko.html. Para las páginas de
+  carrito/pago tiene sentido (páginas transaccionales). Para
+  catalogo.html —el catálogo de productos— bloquea que Google indexe
+  la tienda; si es intencional (p. ej. mientras se termina el
+  catálogo) no requiere cambios, pero si se quiere que la tienda
+  aparezca en búsquedas de Google habría que cambiarlo a "index,follow"
+  y añadirla al sitemap.
