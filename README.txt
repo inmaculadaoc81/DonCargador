@@ -237,6 +237,21 @@ BUG REAL — a petición del cliente ("los botones no funcionan"):
   tienda, carrito, pago-ok, pago-ko): todos usan URLs reales o anclas
   con id correspondiente; no se ha encontrado ningún otro enlace roto.
 
+BUG REAL — a petición del cliente ("en móvil no funciona ningún
+botón, solo el menú se abre pero sus enlaces no llevan a ningún
+sitio"): el script que cierra el menú móvil ejecutaba
+document.getElementById('mobileMenu').hidden=true de forma SÍNCRONA
+dentro del propio evento "click" de cada enlace del menú. Es un
+comportamiento conocido de Safari/iOS (y algunos Chrome Android):
+si el elemento pulsado (o su contenedor) se oculta antes de que el
+navegador termine de procesar el toque, cancela la navegación del
+enlace — el menú se veía, se abría bien, pero ningún enlace de dentro
+llevaba a ningún sitio en móvil (en escritorio, con clic de ratón, no
+se manifestaba igual). Corregido envolviendo el hidden=true en
+setTimeout(...,0) para que se ejecute en el siguiente ciclo, después
+de que el navegador ya haya iniciado la navegación. Aplicado en
+index.html y catalogo.html (mismo script duplicado en ambos).
+
 - A VALORAR (no modificado, es una decisión de negocio, no un bug de
   código): catalogo.html tiene <meta name="robots"
   content="noindex,nofollow"> y no aparece en sitemap.xml, igual que

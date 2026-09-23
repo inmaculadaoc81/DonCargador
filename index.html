@@ -62,7 +62,7 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 <div id="mobileMenu" class="mobile-menu" hidden>
 <a class="tienda-link" href="/catalogo.html">Tienda</a><a class="recogida-link" href="https://sis.redsys.es/tiendaWeb/item/NDk4OzM5" target="_blank" rel="noopener">Solicita el envío</a><a href="#marcas">Marcas</a><a href="#cita">Pedir cita</a><a href="#guia">Guía</a><a href="#contacto">Contacto</a>
 </div>
-<script>document.querySelectorAll("#mobileMenu a").forEach(function(a){a.addEventListener("click",function(){document.getElementById("mobileMenu").hidden=true;});});</script>
+<script>document.querySelectorAll("#mobileMenu a").forEach(function(a){a.addEventListener("click",function(){setTimeout(function(){document.getElementById("mobileMenu").hidden=true;},0);});});</script>
 </header>
 
 
