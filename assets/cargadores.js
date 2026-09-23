@@ -94,7 +94,7 @@
     const codigo=Object.prototype.hasOwnProperty.call(ENLACES_GETNET,referencia) ? ENLACES_GETNET[referencia] : null;
     const disponible=Boolean(codigo) && Number(pieza.precio)>0 && stock !== null && stock>0;
     const stockTexto=stock === null ? 'Stock pendiente de confirmar' : stock === 0 ? 'Sin existencias' : 'Stock: '+stock+' '+(stock===1?'unidad':'unidades');
-    const boton=disponible ? '<a class="cargador-anadir" style="display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none" href="https://sis.redsys.es/tiendaWeb/item/'+codigo+'" target="_blank" rel="noopener noreferrer" aria-label="Comprar: '+escapeHtml(pieza.nombre||'Cargador')+'">Comprar</a>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
+    const boton=disponible ? '<a class="cargador-anadir" style="display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none" href="https://sis.redsys.es/tiendaWeb/item/'+codigo+'" rel="noopener noreferrer" aria-label="Comprar: '+escapeHtml(pieza.nombre||'Cargador')+'">Comprar</a>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
     return '<article class="cargador-card">'+imagenDe(pieza)+
       '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(pieza))+'</div>'+
       '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+
