@@ -172,6 +172,21 @@ tapaba la cabecera y ocupaba casi todo el ancho de la pantalla):
   robots.txt y sitemap.xml apuntan al dominio correcto; los 12
   archivos JS del repo (assets/api/lib/backend) pasan
   "node --check" sin errores.
+CORRECCIÓN DEL FIX ANTERIOR — el primer intento (definir
+--chat--window--right/bottom/z-index como variables CSS en #n8n-chat,
+esperando que .chat-window-wrapper las heredara) se desplegó
+correctamente (confirmado con curl que producción tenía ese código
+exacto) pero el cliente reportó que la ventana seguía viéndose igual
+de mal. En vez de seguir dependiendo de que la herencia de variables
+CSS llegue correctamente a .chat-window-wrapper, se ha sustituido por
+un override directo con !important sobre .chat-window-wrapper mismo
+(position/top/left/right/bottom/width/max-width/height/max-height/
+z-index), que es el elemento con position:fixed real según el
+style.css de la librería. .chat-window (el hijo) ahora solo hace
+width:100%;height:100% para rellenar ese wrapper ya correctamente
+posicionado y limitado, en vez de competir con position:fixed propio.
+Aplicado en catalogo.html e index.html.
+
 - A VALORAR (no modificado, es una decisión de negocio, no un bug de
   código): catalogo.html tiene <meta name="robots"
   content="noindex,nofollow"> y no aparece en sitemap.xml, igual que
