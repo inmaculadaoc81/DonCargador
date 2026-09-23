@@ -43,6 +43,8 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 .float-wa{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--wa);color:#fff;z-index:10050;box-shadow:0 10px 28px #0003}.float-wa svg{width:31px;height:31px}.float-wa:hover{transform:translateY(-2px)}
 #n8n-chat{--chat--toggle--position-bottom:96px;--chat--toggle--position-right:22px;--chat--color-primary:#123552;--chat--color-secondary:#79b45d;--chat--toggle--background:#123552;--chat--toggle--hover--background:#0e2b42;--chat--toggle--active--background:#0e2b42}#n8n-chat .chat-window-toggle{position:fixed!important;right:22px!important;bottom:96px!important;z-index:10051!important}#n8n-chat .chat-window{position:fixed!important;right:22px!important;bottom:170px!important;max-height:calc(100vh - 190px)!important;z-index:10049!important}@media(max-width:600px){#n8n-chat .chat-window{right:12px!important;bottom:165px!important;max-width:calc(100vw - 24px)!important;max-height:calc(100vh - 185px)!important}}
 @media(max-width:900px){.menu{display:none}.menu-btn{display:block}.grid,.compare{grid-template-columns:1fr}.hero{padding-top:42px}.actions,.brands,.pain-grid,.steps,form,.trust{grid-template-columns:1fr}.full,textarea{grid-column:auto}.logo{width:220px}.card{padding:23px}.hero:before{font-size:44px;right:-60px}.footergrid{grid-template-columns:1fr}}
+
+.hero-actions{grid-template-columns:1fr;gap:12px;max-width:680px}.hero-actions .hero-btn{min-height:70px;border-radius:18px;padding:12px 18px;justify-content:flex-start;text-align:left;gap:14px;box-shadow:0 8px 22px rgba(16,33,49,.10);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}.hero-actions .hero-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(16,33,49,.16)}.hero-btn-icon{width:42px;height:42px;min-width:42px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.18)}.hero-btn-icon svg{width:23px;height:23px;margin:0}.hero-btn-copy{display:flex;flex-direction:column;line-height:1.2}.hero-btn-copy strong{font-size:16px}.hero-btn-copy small{font-size:12.5px;margin-top:5px;font-weight:700;opacity:.9}.hero-wa{background:var(--wa);color:#fff;border-color:var(--wa)}.hero-send{background:var(--navy);color:#fff;border-color:var(--navy)}.hero-store{background:#fff;color:var(--navy);border:2px solid var(--green)}.hero-store .hero-btn-icon{background:var(--soft);color:var(--navy)}
 </style>
 </head>
 <body>
@@ -59,11 +61,20 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 <div><div class="eyebrow">Cuando necesitas volver a usar tu portátil, elegir bien un cargador importa</div>
 <h1>Encuentra el cargador original correcto para tu portátil.</h1>
 
-<div class="actions">
-<a class="btn wa" href="https://api.whatsapp.com/send?phone=34649970128&text=%C2%A1Hola%20DonCargador" target="_blank" rel="noopener"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3.5A12.4 12.4 0 0 1 5.3 22l-1.6 6.2 6.35-1.66A12.4 12.4 0 1 0 16 3.5Zm0 22.5a10.1 10.1 0 0 1-5.16-1.4l-.37-.22-3.77.99 1.01-3.66-.24-.39A10.1 10.1 0 1 1 16 26Z"/></svg>WhatsApp | Atención 24 horas 365 días | +34 649 97 01 28</a>
-<a class="btn blue" href="https://sis.redsys.es/tiendaWeb/item/NDk4OzQ=" target="_blank" rel="noopener">Solicita el envío de tu cargador ahora</a>
-<a class="btn full" href="/catalogo.html">Nuestra tienda</a>
-</div></div>
+<div class="actions hero-actions">
+<a class="btn hero-btn wa hero-wa" href="https://api.whatsapp.com/send?phone=34649970128&text=%C2%A1Hola%20DonCargador" target="_blank" rel="noopener" aria-label="WhatsApp Atención 24 horas 365 días +34 649 97 01 28">
+  <span class="hero-btn-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 3.5A12.4 12.4 0 0 1 5.3 22l-1.6 6.2 6.35-1.66A12.4 12.4 0 1 0 16 3.5Zm0 22.5a10.1 10.1 0 0 1-5.16-1.4l-.37-.22-3.77.99 1.01-3.66-.24-.39A10.1 10.1 0 1 1 16 26Zm5.54-7.55c-.3-.15-1.8-.89-2.08-.99-.28-.1-.49-.15-.69.15-.2.3-.8.99-.98 1.19-.18.2-.36.23-.67.08-.3-.15-1.29-.48-2.46-1.52-.91-.81-1.52-1.82-1.7-2.12-.18-.3-.02-.47.14-.62.14-.14.3-.36.46-.54.16-.18.2-.3.31-.51.1-.2.05-.39-.03-.54-.08-.15-.7-1.68-.96-2.3-.25-.6-.51-.52-.69-.53h-.6c-.2 0-.54.08-.82.39-.28.3-1.08 1.06-1.08 2.59 0 1.52 1.11 2.99 1.26 3.2.15.2 2.18 3.34 5.29 4.69.74.32 1.32.51 1.77.65.74.24 1.41.2 1.95.12.6-.09 1.8-.73 2.05-1.45.25-.71.25-1.32.18-1.45-.08-.13-.29-.2-.59-.35Z"/></svg></span>
+  <span class="hero-btn-copy"><strong>WhatsApp</strong><small>Atención 24 horas · 365 días · +34 649 97 01 28</small></span>
+</a>
+<a class="btn hero-btn hero-send" href="https://sis.redsys.es/tiendaWeb/item/NDk4OzQ=" target="_blank" rel="noopener">
+  <span class="hero-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h13v10H3z"/><path d="M16 10h3l2 3v4h-5z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
+  <span class="hero-btn-copy"><strong>Solicita el envío de tu cargador ahora</strong><small>Gestiona tu solicitud online</small></span>
+</a>
+<a class="btn hero-btn hero-store" href="/catalogo.html">
+  <span class="hero-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l2-5h14l2 5"/><path d="M5 13v7h14v-7"/><path d="M9 20v-6h6v6"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/></svg></span>
+  <span class="hero-btn-copy"><strong>Nuestra tienda</strong><small>Ver cargadores disponibles</small></span>
+</a>
+</div></div></div>
 <aside class="card"><div class="eyebrow">INFORMACIÓN DE CONTACTO</div><h2>Don Cargador Madrid</h2><div class="row"><small>Dirección</small><b>C. Joaquín María López, 26, 28015 Madrid</b></div><div class="row"><small>Horario</small><b>Lunes a viernes: 09:30 – 18:00h</b><br><span>Sábados, domingos y días festivos estamos cerrados</span></div><div class="row"><small>Atención 24 horas</small><b>+34 918 29 46 58</b></div><div class="row"><small>Servicio</small><b>Venta de cargadores originales para portátiles</b></div><div class="ref"><b>Cómo encontrar tu referencia:</b> revisa la etiqueta del cargador original o el modelo exacto del portátil. Si tienes dudas, te ayudamos a identificarlo.</div><a class="maplink" href="https://maps.app.goo.gl/QMZY3SQAJZJt9Mkm6">Ver ubicación y reseñas →</a></aside>
 </div></section>
 
