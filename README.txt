@@ -252,6 +252,35 @@ setTimeout(...,0) para que se ejecute en el siguiente ciclo, después
 de que el navegador ya haya iniciado la navegación. Aplicado en
 index.html y catalogo.html (mismo script duplicado en ambos).
 
+BUG REAL — a petición del cliente ("hay archivos que ya no se usan,
+se iba a vincular anteriormente a Redsys pero ya no, ahora solo debe
+de vincularse con la base de datos para que aparezca en la tienda"):
+assets/cargadores.js tenía una tabla ENLACES_GETNET con códigos de
+Redsys asignados a mano para solo ~29 referencias. El botón de cada
+cargador SOLO aparecía como "Comprar" (enlazando directo a Redsys) si
+su referencia estaba en esa lista; para cualquier otro producto de la
+base de datos (la mayoría) se mostraba "Consultar disponibilidad" sin
+ningún botón funcional — de ahí "no funcionan los botones" en la
+tienda. Esta tabla era del flujo de compra antiguo (enlace directo a
+un ítem de Redsys por producto), ya sustituido por el flujo real de
+carrito.html + carrito.js + backend/doncargador (que genera el
+formulario de pago firmado en el servidor mediante lib/redsys*.js).
+Corregido:
+- Eliminada ENLACES_GETNET por completo.
+- El botón ahora depende solo de la base de datos (referencia válida,
+  precio>0, stock>0), sin ninguna tabla de excepciones.
+- El botón pasa de ser un enlace <a href="redsys..."> a un
+  <button>"Añadir al carrito"</button> que guarda el producto en el
+  mismo carrito (localStorage doncargador_carrito_v1) que ya usa
+  carrito.html — funciona igual en la portada y en la tienda.
+- Actualizado el aviso de la portada ("Selecciona un cargador para
+  consultar su ficha en Getnet...") a un texto que refleja el flujo
+  de carrito real.
+- Revisado el resto del repositorio: todos los archivos de assets/
+  están enlazados en alguna página; lib/redsys*.js SÍ se usa (desde
+  backend/doncargador/servicio.js, es el backend real del pago) — no
+  se ha tocado, no es un archivo huérfano.
+
 - A VALORAR (no modificado, es una decisión de negocio, no un bug de
   código): catalogo.html tiene <meta name="robots"
   content="noindex,nofollow"> y no aparece en sitemap.xml, igual que
