@@ -262,3 +262,12 @@ index.html y catalogo.html (mismo script duplicado en ambos).
   catálogo) no requiere cambios, pero si se quiere que la tienda
   aparezca en búsquedas de Google habría que cambiarlo a "index,follow"
   y añadirla al sitemap.
+
+CORRECCIÓN — revertido el cambio anterior sobre "Comprar": el cliente
+confirmó que los enlaces actuales de "Comprar" de cada cargador (los
+que usan ENLACES_GETNET → https://sis.redsys.es/tiendaWeb/item/...)
+SON correctos y deben mantenerse tal cual, no sustituirse por un
+carrito. Revertido con git revert (commit 4960f8d), assets/cargadores.js
+queda exactamente como estaba antes de ese cambio. El problema real
+de "archivos que ya no se usan" que el cliente señaló sigue pendiente
+de identificar con más detalle — no era ENLACES_GETNET.
