@@ -203,6 +203,20 @@ SOLICITUD DEL CLIENTE — botón "Solicita recogida" en el menú:
   assets/cargadores.js (usa un código de producto distinto por cada
   cargador del catálogo, no es el enlace de envío/recogida genérico).
 
+AJUSTES DEL CLIENTE sobre los botones (misma sesión):
+- Orden del menú corregido: "Tienda" va primero, "Solicita el envío"
+  (antes llamado "Solicita recogida", renombrado a petición del
+  cliente para que coincida con el botón del hero) va después.
+- Icono de WhatsApp del hero (.hero-wa) sustituido: usaba un círculo
+  + trazo de teléfono simplificado; ahora usa el mismo logotipo
+  detallado de WhatsApp que ya se usa en el botón flotante (.float-wa),
+  mismo patrón aplicado antes en otros repos de la familia
+  (SmartSheets).
+- Botón del hero "Solicita el envío de tu cargador ahora": eliminado
+  el subtítulo "Gestiona tu solicitud online" y sustituido por "Solo
+  para la Península", a petición del cliente (el envío no cubre
+  Canarias/Baleares/Ceuta/Melilla).
+
 - A VALORAR (no modificado, es una decisión de negocio, no un bug de
   código): catalogo.html tiene <meta name="robots"
   content="noindex,nofollow"> y no aparece en sitemap.xml, igual que
