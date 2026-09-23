@@ -1,7 +1,6 @@
 (function () {
   // Catálogo público: los enlaces Getnet se asignan por referencia exacta.
-  const config = window.DONCARGADOR_COMPRA || {apiOrigen:'https://db.affirmatechnology.com/kelatos-api',pagosHabilitados:false};
-  const ENDPOINT = config.apiOrigen + '/publico/piezas-cargador';
+  const ENDPOINT = 'https://db.affirmatechnology.com/kelatos-api/publico/piezas-cargador';
   const ENLACES_GETNET = Object.freeze({
     '666':'NDk4OzEw','22':'NDk4OzEx','23':'NDk4OzEy','24':'NDk4OzEz',
     '4578':'NDk4OzE0','456':'NDk4OzE1','9':'NDk4OzE2','10':'NDk4OzE3',
@@ -61,33 +60,6 @@
       return '<img class="cargador-imagen" src="'+escapeHtml(url.href)+'" alt="'+escapeHtml(pieza.nombre)+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="cargador-imagen-placeholder" hidden aria-hidden="true">DC</span>';
     } catch { return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>'; }
   }
-  function obtenerCarrito() {
-    try {
-      const datos=JSON.parse(localStorage.getItem('doncargador_carrito_v1')||'[]');
-      return Array.isArray(datos) ? datos.filter(x=>x && typeof x.referencia==='string' && Number.isSafeInteger(x.cantidad) && x.cantidad>0 && x.cantidad<=20).slice(0,20) : [];
-    } catch { return []; }
-  }
-  function actualizarContador() {
-    const total=obtenerCarrito().reduce((n,x)=>n+x.cantidad,0);
-    const etiqueta=document.getElementById('carrito-contador');
-    if (etiqueta) etiqueta.textContent=String(total);
-    const contadorInicio=document.getElementById('carrito-contador-inicio');
-    if (contadorInicio) contadorInicio.textContent=String(total);
-  }
-  function prepararInicio() {
-    if (!esInicio) return;
-    const seccion=document.getElementById('stock-disponible-ahora') || contenedor.parentElement;
-    if (!seccion || document.getElementById('carrito-enlace-inicio')) return;
-    const estilo=document.createElement('style');
-    estilo.textContent='#stock-disponible-ahora .cargador-body{display:flex;flex-direction:column;flex:1}#stock-disponible-ahora .cargador-card{display:flex;flex-direction:column}#stock-disponible-ahora .cargador-precio{margin-top:auto}#stock-disponible-ahora .cargador-stock{margin:8px 0;color:#286c32;font-weight:700}#stock-disponible-ahora .cargador-anadir{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;background:#123552;color:white;padding:12px 16px;border-radius:25px;font-weight:800;margin-top:9px}#stock-disponible-ahora .cargador-anadir:hover,#stock-disponible-ahora .cargador-anadir:focus{text-decoration:none}#stock-disponible-ahora .cargador-no-disponible{display:block;margin-top:8px}#carrito-enlace-inicio{display:inline-flex;align-items:center;gap:6px;background:#123552;color:#fff;padding:12px 20px;border-radius:999px;font-weight:800;text-decoration:none;margin-top:14px}#aviso-carrito-inicio{margin:13px 0;color:#123552;font-size:14px}';
-    document.head.appendChild(estilo);
-    const enlace=document.createElement('a');enlace.id='carrito-enlace-inicio';enlace.href='/carrito.html';
-    enlace.innerHTML='Ver carrito (<span id="carrito-contador-inicio">0</span>) →';
-    seccion.insertBefore(enlace,contenedor);
-    const aviso=document.createElement('p');aviso.id='aviso-carrito-inicio';
-    aviso.textContent='Selecciona un cargador para consultar su ficha en Getnet. Comprueba la compatibilidad antes de comprar.';
-    seccion.insertBefore(aviso,contenedor);
-  }
   function tarjeta(pieza) {
     const stock=unidades(pieza);
     const referencia=String(pieza.referencia == null ? '' : pieza.referencia).trim();
@@ -123,8 +95,6 @@
     if (busqueda) busqueda.addEventListener('input',actualizar);
     actualizar();
   }
-  prepararInicio();
-  actualizarContador();
   fetch(ENDPOINT,{cache:'no-store'})
     .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(d=>{
