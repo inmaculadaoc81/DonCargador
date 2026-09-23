@@ -1,7 +1,16 @@
 (function () {
-  // Catálogo público: los productos se muestran y se añaden al carrito según la base de datos (referencia, stock y precio). El pago se gestiona desde carrito.html.
+  // Catálogo público: los enlaces Getnet se asignan por referencia exacta.
   const config = window.DONCARGADOR_COMPRA || {apiOrigen:'https://db.affirmatechnology.com/kelatos-api',pagosHabilitados:false};
   const ENDPOINT = config.apiOrigen + '/publico/piezas-cargador';
+  const ENLACES_GETNET = Object.freeze({
+    '666':'NDk4OzEw','22':'NDk4OzEx','23':'NDk4OzEy','24':'NDk4OzEz',
+    '4578':'NDk4OzE0','456':'NDk4OzE1','9':'NDk4OzE2','10':'NDk4OzE3',
+    '7':'NDk4OzE4','8':'NDk4OzE5','19':'NDk4OzIw','20':'NDk4OzIx',
+    '21':'NDk4OzIy','12':'NDk4OzIz','15':'NDk4OzI0','13':'NDk4OzI1',
+    '14':'NDk4OzI2','16':'NDk4OzI3','17':'NDk4OzI4','18':'NDk4OzI5',
+    '4':'NDk4OzMw','5':'NDk4OzMx','77':'NDk4OzMy','3':'NDk4OzMz',
+    '2':'NDk4OzM0','1':'NDk4OzM1','11':'NDk4OzM2','555':'NDk4OzM3','6':'NDk4OzM4'
+  });
   const contenedor = document.getElementById('cargadores-lista');
   if (!contenedor) return;
   const esInicio = !document.getElementById('cargadores-busqueda');
@@ -76,23 +85,16 @@
     enlace.innerHTML='Ver carrito (<span id="carrito-contador-inicio">0</span>) →';
     seccion.insertBefore(enlace,contenedor);
     const aviso=document.createElement('p');aviso.id='aviso-carrito-inicio';
-    aviso.textContent='Añade un cargador al carrito y confirma tu pedido desde ahí. Comprueba la compatibilidad antes de comprar.';
+    aviso.textContent='Selecciona un cargador para consultar su ficha en Getnet. Comprueba la compatibilidad antes de comprar.';
     seccion.insertBefore(aviso,contenedor);
-  }
-  function agregarAlCarrito(referencia) {
-    const carrito=obtenerCarrito();
-    const linea=carrito.find(x=>x.referencia===referencia);
-    if (linea) { if (linea.cantidad<20) linea.cantidad++; }
-    else carrito.push({referencia:referencia,cantidad:1});
-    try { localStorage.setItem('doncargador_carrito_v1',JSON.stringify(carrito.slice(0,20))); } catch {}
-    actualizarContador();
   }
   function tarjeta(pieza) {
     const stock=unidades(pieza);
     const referencia=String(pieza.referencia == null ? '' : pieza.referencia).trim();
-    const disponible=Boolean(referencia) && Number(pieza.precio)>0 && stock !== null && stock>0;
+    const codigo=Object.prototype.hasOwnProperty.call(ENLACES_GETNET,referencia) ? ENLACES_GETNET[referencia] : null;
+    const disponible=Boolean(codigo) && Number(pieza.precio)>0 && stock !== null && stock>0;
     const stockTexto=stock === null ? 'Stock pendiente de confirmar' : stock === 0 ? 'Sin existencias' : 'Stock: '+stock+' '+(stock===1?'unidad':'unidades');
-    const boton=disponible ? '<button type="button" class="cargador-anadir" data-anadir="'+escapeHtml(referencia)+'" aria-label="Añadir al carrito: '+escapeHtml(pieza.nombre||'Cargador')+'">Añadir al carrito</button>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
+    const boton=disponible ? '<a class="cargador-anadir" style="display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none" href="https://sis.redsys.es/tiendaWeb/item/'+codigo+'" rel="noopener noreferrer" aria-label="Comprar: '+escapeHtml(pieza.nombre||'Cargador')+'">Comprar</a>' : '<span class="cargador-no-disponible">Consultar disponibilidad</span>';
     return '<article class="cargador-card">'+imagenDe(pieza)+
       '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(pieza))+'</div>'+
       '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+
@@ -121,14 +123,6 @@
     if (busqueda) busqueda.addEventListener('input',actualizar);
     actualizar();
   }
-  contenedor.addEventListener('click',e=>{
-    const boton=e.target.closest('button[data-anadir]');
-    if (!boton) return;
-    agregarAlCarrito(boton.dataset.anadir);
-    const textoOriginal=boton.textContent;
-    boton.disabled=true;boton.textContent='Añadido ✓';
-    setTimeout(()=>{boton.disabled=false;boton.textContent=textoOriginal;},1200);
-  });
   prepararInicio();
   actualizarContador();
   fetch(ENDPOINT,{cache:'no-store'})
