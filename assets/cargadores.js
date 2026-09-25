@@ -27,13 +27,14 @@
     if (destino) return destino === 'PORTATIL' || destino === 'PORTATILES';
     return !/\bDYSON\b/.test(normalizar([pieza.nombre,pieza.descripcion].join(' ')));
   }
-  function marcaDe(pieza) {
-    const marca = String(pieza.marca || '').trim();
-    if (marca) return marca;
-    const nombre = normalizar(pieza.nombre);
-    const conocidas = ['HP','ACER','ASUS','DELL','LENOVO','MSI','SAMSUNG','TOSHIBA','MICROSOFT','SURFACE','APPLE','LG','HUAWEI','GIGABYTE','RAZER','MEDION'];
-    return conocidas.find(item=>new RegExp('\\b'+item+'\\b').test(nombre)) || 'Otras marcas';
+  const MARCAS_CONOCIDAS = ['ACER','APPLE','ASUS','DELL','FUJITSU','GIGABYTE','HP','HONOR','HUAWEI','LG','LENOVO','MEDION','MICROSOFT','MSI','RAZER','SAMSUNG','SURFACE','TOSHIBA','XIAOMI'];
+  function marcasDe(pieza) {
+    const texto = normalizar([pieza && pieza.marca,pieza && pieza.nombre,pieza && pieza.descripcion].join(' '));
+    const encontradas = MARCAS_CONOCIDAS.filter(marca=>new RegExp('\\b'+marca+'\\b').test(texto));
+    if (encontradas.includes('MICROSOFT') && encontradas.includes('SURFACE')) return encontradas.filter(m=>m!=='MICROSOFT');
+    return encontradas.length ? encontradas : ['OTRAS MARCAS'];
   }
+  function marcaDe(pieza) { return marcasDe(pieza)[0]; }
   function euros(precio) {
     if (precio == null || precio === '' || !Number.isFinite(Number(precio)) || Number(precio) <= 0) return 'Consultar precio';
     return Number(precio).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
@@ -51,14 +52,18 @@
       HP:'cargador-hp.webp', LENOVO:'cargador-lenovo.webp',
       MICROSOFT:'cargador-surface.webp', SURFACE:'cargador-surface.webp'
     };
-    const imagenMarca = imagenes[normalizar(marcaDe(pieza))];
-    const ruta = pieza.imagen_url || (imagenMarca ? '/assets/images/'+imagenMarca : '');
-    if (!ruta) return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>';
+    const marcas=marcasDe(pieza);
+    const multimarca=marcas.some(m=>m==='MSI'||m==='GIGABYTE');
+    const imagenMarca=multimarca ? 'cargador-portatil-msi-gigabyte-asus-450x450.webp' : imagenes[marcas[0]];
+    const respaldo='/assets/images/doncargador-imagen-no-disponible-450x450.webp';
+    const ruta=pieza.imagen_url || (imagenMarca ? '/assets/images/'+imagenMarca : respaldo);
     try {
-      const url = new URL(String(ruta),window.location.href);
-      if (url.protocol !== 'https:') throw new Error('URL no segura');
-      return '<img class="cargador-imagen" src="'+escapeHtml(url.href)+'" alt="'+escapeHtml(pieza.nombre)+'" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="cargador-imagen-placeholder" hidden aria-hidden="true">DC</span>';
-    } catch { return '<div class="cargador-imagen-placeholder" aria-hidden="true">DC</div>'; }
+      const url=new URL(String(ruta),window.location.href);
+      if(url.protocol!=='https:') throw new Error('URL no segura');
+      return '<img class="cargador-imagen" src="'+escapeHtml(url.href)+'" alt="'+escapeHtml(pieza.nombre)+'" loading="lazy" onerror="this.onerror=null;this.src=\''+respaldo+'\'">';
+    } catch {
+      return '<img class="cargador-imagen" src="'+respaldo+'" alt="'+escapeHtml(pieza.nombre||'Cargador')+'" loading="lazy">';
+    }
   }
   function tarjeta(pieza) {
     const stock=unidades(pieza);
@@ -67,9 +72,9 @@
     const disponible=Boolean(codigo) && Number(pieza.precio)>0 && stock !== null && stock>0;
     const stockTexto=stock === null ? 'Stock pendiente de confirmar' : stock === 0 ? 'Sin existencias' : 'Stock: '+stock+' '+(stock===1?'unidad':'unidades');
     const consultaUrl='/?cargador='+encodeURIComponent(pieza.nombre||'Cargador')+'#contacto';
-    const boton=disponible ? '<a class="cargador-anadir" style="display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none" href="https://sis.redsys.es/tiendaWeb/item/'+codigo+'" rel="noopener noreferrer" aria-label="Comprar: '+escapeHtml(pieza.nombre||'Cargador')+'">Comprar</a>' : '<a class="cargador-anadir" href="'+escapeHtml(consultaUrl)+'" aria-label="Consultar disponibilidad: '+escapeHtml(pieza.nombre||'Cargador')+'">Consultar disponibilidad</a>';
+    const boton=disponible ? '<a class="cargador-anadir" style="display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none" href="https://sis.redsys.es/tiendaWeb/item/'+codigo+'" rel="noopener noreferrer" aria-label="Comprar: '+escapeHtml(pieza.nombre||'Cargador')+'">Comprar</a>' : '<a class="cargador-anadir cargador-consultar" href="'+escapeHtml(consultaUrl)+'" aria-label="Consultar disponibilidad: '+escapeHtml(pieza.nombre||'Cargador')+'">Consultar disponibilidad</a>';
     return '<article class="cargador-card">'+imagenDe(pieza)+
-      '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcaDe(pieza))+'</div>'+
+      '<div class="cargador-body"><div class="cargador-categoria">'+escapeHtml(marcasDe(pieza).join(' · '))+'</div>'+
       '<h4 class="cargador-nombre">'+escapeHtml(pieza.nombre||'Cargador')+'</h4>'+
       '<p class="cargador-desc">Precio incluye IVA.</p>'+
       '<div class="cargador-precio">'+euros(pieza.precio)+'</div><p class="cargador-stock">'+stockTexto+'</p>'+boton+'</div></article>';
@@ -77,7 +82,7 @@
   function mostrar(piezas) {
     const filtros=document.getElementById('cargadores-filtros');
     const busqueda=document.getElementById('cargadores-busqueda');
-    const marcas=Array.from(new Set(piezas.map(marcaDe))).sort((a,b)=>a.localeCompare(b,'es'));
+    const marcas=Array.from(new Set(piezas.flatMap(marcasDe))).sort((a,b)=>a.localeCompare(b,'es'));
     let activa='Todas';
     if (filtros) {
       filtros.innerHTML='';
@@ -90,7 +95,7 @@
     function actualizar() {
       const termino=normalizar(busqueda?busqueda.value:'');
       if (filtros) Array.from(filtros.children).forEach(b=>b.setAttribute('aria-pressed',String(b.textContent===activa)));
-      const visibles=piezas.filter(p=>(activa==='Todas'||marcaDe(p)===activa)&&normalizar([p.nombre,p.descripcion,marcaDe(p)].join(' ')).includes(termino));
+      const visibles=piezas.filter(p=>(activa==='Todas'||marcasDe(p).includes(activa))&&normalizar([p.nombre,p.descripcion,marcasDe(p).join(' ')].join(' ')).includes(termino));
       contenedor.innerHTML=visibles.length?visibles.map(tarjeta).join(''):'<p class="cargadores-vacio">No hay cargadores que coincidan con tu búsqueda.</p>';
     }
     if (busqueda) busqueda.addEventListener('input',actualizar);
