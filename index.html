@@ -101,10 +101,17 @@ footer{padding:40px 0;background:var(--navy2);color:#fff}.footergrid{display:gri
 
 <section class="calendar" id="cita"><div class="wrap"><div class="sectiontag">SI PREFIERES DEJARLO AGENDADO</div><h2 class="title">Reserva una cita de 30 minutos.</h2><iframe src="https://cal.com/kelatos/30min?embed=true&theme=light&attendeePhoneNumber=%2B34&overlayCalendar=true" title="Reservar cita" loading="lazy"></iframe></div></section>
 
-<section id="contacto"><div class="wrap"><div class="sectiontag">¿NO SABES QUÉ CARGADOR NECESITAS?</div><h2 class="title">Envíanos los datos de tu portátil.</h2><p class="intro">No necesitas conocer especificaciones técnicas. Con la marca y el modelo podemos empezar a orientarte.</p><form id="contactForm"><input name="name" placeholder="Nombre" required><input name="email" type="email" placeholder="Correo electrónico" required><input name="phone" placeholder="Teléfono"><input name="subject" placeholder="Marca y modelo del portátil"><textarea name="message" placeholder="Cuéntanos qué cargador necesitas o copia aquí la referencia de tu equipo." required></textarea><label class="full privacy-check"><input type="checkbox" name="privacidad" required> Acepto la <a class="privacy-link" href="https://kelatos.com/privacy-policy/" target="_blank" rel="noopener">política de privacidad</a></label><button class="btn blue full" type="submit">Enviar consulta</button><div class="status" id="status"></div></form>
+<section id="contacto"><div class="wrap"><div class="sectiontag">¿NO SABES QUÉ CARGADOR NECESITAS?</div><h2 class="title">Envíanos los datos de tu portátil.</h2><p class="intro">No necesitas conocer especificaciones técnicas. Con la marca y el modelo podemos empezar a orientarte.</p><form id="contactForm"><input name="name" placeholder="Nombre" required><input name="email" type="email" placeholder="Correo electrónico" required><input name="phone" placeholder="Teléfono"><input name="subject" placeholder="Marca y modelo del portátil o cargador"><textarea name="message" placeholder="Cuéntanos qué cargador necesitas o copia aquí la referencia de tu equipo." required></textarea><label class="full privacy-check"><input type="checkbox" name="privacidad" required> Acepto la <a class="privacy-link" href="https://kelatos.com/privacy-policy/" target="_blank" rel="noopener">política de privacidad</a></label><button class="btn blue full" type="submit">Enviar consulta</button><div class="status" id="status"></div></form>
 <script>
 (function(){
   const form=document.getElementById('contactForm');
+  const params=new URLSearchParams(window.location.search);
+  const cargadorConsultado=params.get('cargador');
+  if(form&&cargadorConsultado){
+    const subject=form.querySelector('[name="subject"]');
+    if(subject) subject.value=cargadorConsultado;
+    setTimeout(()=>document.getElementById('contacto')?.scrollIntoView({behavior:'smooth',block:'start'}),0);
+  }
   const status=document.getElementById('status');
   if(!form||!status)return;
   form.addEventListener('submit',async function(e){
