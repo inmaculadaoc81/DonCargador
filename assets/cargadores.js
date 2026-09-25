@@ -3,8 +3,8 @@
   const ENDPOINT = 'https://db.affirmatechnology.com/kelatos-api/publico/piezas-cargador';
   const ENLACES_GETNET = Object.freeze({
     '666':'NDk4OzEw','22':'NDk4OzEx','23':'NDk4OzEy','24':'NDk4OzEz',
-    '4578':'NDk4OzE0','456':'NDk4OzE1','9':'NDk4OzE2','10':'NDk4OzE3',
-    '7':'NDk4OzE4','8':'NDk4OzE5','19':'NDk4OzIw','20':'NDk4OzIx',
+    '4578':'NDk4OzE0','456':'NDk4OzE1','9':'NDk4OzQx','10':'NDk4OzQy',
+    '7':'NDk4OzQz','8':'NDk4OzQw','19':'NDk4OzIw','20':'NDk4OzIx',
     '21':'NDk4OzIy','12':'NDk4OzIz','15':'NDk4OzI0','13':'NDk4OzI1',
     '14':'NDk4OzI2','16':'NDk4OzI3','17':'NDk4OzI4','18':'NDk4OzI5',
     '4':'NDk4OzMw','5':'NDk4OzMx','77':'NDk4OzMy','3':'NDk4OzMz',
