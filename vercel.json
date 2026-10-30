@@ -1,9 +1,17 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/blog.js": { "includeFiles": "index.html" }
+  },
+  "rewrites": [
+    { "source": "/blog", "destination": "/api/blog" },
+    { "source": "/blog/:slug", "destination": "/api/blog?slug=:slug" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" }
+  ],
   "redirects": [
     { "source": "/sitemap_index.xml", "destination": "/sitemap.xml", "permanent": true },
     { "source": "/:wp(.*-sitemap\\d*\\.xml)", "destination": "/sitemap.xml", "permanent": true },
-    { "source": "/((?!api/|assets/|catalogo|sitemap\\.xml|robots\\.txt|_vercel).+)", "destination": "/", "permanent": true }
+    { "source": "/((?!api/|assets/|catalogo|blog(?:/|$)|sitemap\\.xml|robots\\.txt|_vercel).+)", "destination": "/", "permanent": true }
   ]
 }

@@ -271,3 +271,19 @@ carrito. Revertido con git revert (commit 4960f8d), assets/cargadores.js
 queda exactamente como estaba antes de ese cambio. El problema real
 de "archivos que ya no se usan" que el cliente señaló sigue pendiente
 de identificar con más detalle — no era ENLACES_GETNET.
+
+BLOG (/blog):
+- Los artículos NO viven en este repositorio: los genera y aprueba el agente
+  SEO de Kelatos (Agentes V2 → organización «Don Cargador», clave
+  doncargador) y se leen en vivo de la API pública de Kelatos, sin token:
+  https://db.affirmatechnology.com/kelatos-api/publico/blog?org=doncargador
+- api/blog.js + lib/blog.js (ESM, el package.json es "type": "module")
+  generan /blog y /blog/<slug> en el servidor; copian de index.html los
+  estilos incrustados, la cabecera con su menú móvil, el pie, el botón de
+  WhatsApp, las cookies y Analytics.
+- api/sitemap.js genera /sitemap.xml con la home, /catalogo, /blog y cada
+  artículo publicado (se eliminó el sitemap.xml estático).
+- vercel.json: rewrites de /blog, /blog/<slug> y /sitemap.xml; la redirección
+  de URLs antiguas a la home ya no afecta a /blog.
+- Estilos del blog en assets/blog.css. Enlace «Blog» añadido al menú de
+  escritorio, al menú móvil y al pie de la home y de /catalogo.
