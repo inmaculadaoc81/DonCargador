@@ -5,6 +5,8 @@ export default async function handler(req,res){
   if(req.method!=="POST") return res.status(405).json({error:"Método no permitido"});
   const b=req.body||{};
   if(clean(b.website)) return res.status(200).json({ok:true});
+  const ts=Number(b.ts);
+  if(!ts||Date.now()-ts<2000) return res.status(200).json({ok:true});
   const name=clean(b.name,120),email=clean(b.email,180),phone=clean(b.phone,60),subject=clean(b.subject,160),message=clean(b.message);
   if(!name||!email||!message) return res.status(400).json({error:"Faltan datos obligatorios"});
   if(!EMAIL_RE.test(email)) return res.status(400).json({error:"El correo electrónico no es válido"});
